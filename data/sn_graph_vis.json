@@ -1,0 +1,1135 @@
+{
+  "nodes": [
+    {
+      "id": "疲乏",
+      "label": "疲乏",
+      "primary_type": "全身症状",
+      "centrality_strength": 0.993412,
+      "frequency": 1197
+    },
+    {
+      "id": "头晕",
+      "label": "头晕",
+      "primary_type": "神经症状",
+      "centrality_strength": 0.848614,
+      "frequency": 988
+    },
+    {
+      "id": "头痛",
+      "label": "头痛",
+      "primary_type": "神经症状",
+      "centrality_strength": 0.811764,
+      "frequency": 589
+    },
+    {
+      "id": "发热",
+      "label": "发热",
+      "primary_type": "消化症状",
+      "centrality_strength": 0.837052,
+      "frequency": 650
+    },
+    {
+      "id": "注意力难以集中",
+      "label": "注意力难以集中",
+      "primary_type": "认知症状",
+      "centrality_strength": 0.933528,
+      "frequency": 749
+    },
+    {
+      "id": "反应变慢",
+      "label": "反应变慢",
+      "primary_type": "认知症状",
+      "centrality_strength": 1.102269,
+      "frequency": 945
+    },
+    {
+      "id": "健忘",
+      "label": "健忘",
+      "primary_type": "认知症状",
+      "centrality_strength": 0.961274,
+      "frequency": 1036
+    },
+    {
+      "id": "理解上存在困难",
+      "label": "理解上存在困难",
+      "primary_type": "认知症状",
+      "centrality_strength": 0.888941,
+      "frequency": 465
+    },
+    {
+      "id": "变得更加糊涂",
+      "label": "变得更加糊涂",
+      "primary_type": "认知症状",
+      "centrality_strength": 0.940118,
+      "frequency": 388
+    },
+    {
+      "id": "咳嗽",
+      "label": "咳嗽",
+      "primary_type": "全身症状",
+      "centrality_strength": 0.472744,
+      "frequency": 683
+    },
+    {
+      "id": "嗜睡或难以入睡",
+      "label": "嗜睡或难以入睡",
+      "primary_type": "全身症状",
+      "centrality_strength": 0.652014,
+      "frequency": 1086
+    },
+    {
+      "id": "视力模糊",
+      "label": "视力模糊",
+      "primary_type": "全身症状",
+      "centrality_strength": 0.692003,
+      "frequency": 665
+    },
+    {
+      "id": "皮疹",
+      "label": "皮疹",
+      "primary_type": "皮肤关节症状",
+      "centrality_strength": 0.698354,
+      "frequency": 646
+    },
+    {
+      "id": "口腔溃疡",
+      "label": "口腔溃疡",
+      "primary_type": "皮肤关节症状",
+      "centrality_strength": 0.620084,
+      "frequency": 342
+    },
+    {
+      "id": "肌肉关节疼痛",
+      "label": "肌肉关节疼痛",
+      "primary_type": "皮肤关节症状",
+      "centrality_strength": 0.791907,
+      "frequency": 744
+    },
+    {
+      "id": "手脚发麻",
+      "label": "手脚发麻",
+      "primary_type": "皮肤关节症状",
+      "centrality_strength": 0.771906,
+      "frequency": 644
+    },
+    {
+      "id": "食欲下降",
+      "label": "食欲下降",
+      "primary_type": "消化症状",
+      "centrality_strength": 1.070246,
+      "frequency": 805
+    },
+    {
+      "id": "腹胀腹痛腹泻",
+      "label": "腹胀腹痛腹泻",
+      "primary_type": "消化症状",
+      "centrality_strength": 0.840229,
+      "frequency": 661
+    },
+    {
+      "id": "恶心呕吐",
+      "label": "恶心呕吐",
+      "primary_type": "消化症状",
+      "centrality_strength": 0.773764,
+      "frequency": 469
+    },
+    {
+      "id": "脂肪堆积",
+      "label": "脂肪堆积",
+      "primary_type": "全身症状",
+      "centrality_strength": 0.615473,
+      "frequency": 360
+    },
+    {
+      "id": "消瘦体重减轻",
+      "label": "消瘦体重减轻",
+      "primary_type": "消化症状",
+      "centrality_strength": 0.990482,
+      "frequency": 684
+    },
+    {
+      "id": "性欲下降",
+      "label": "性欲下降",
+      "primary_type": "全身症状",
+      "centrality_strength": 0.729581,
+      "frequency": 596
+    },
+    {
+      "id": "掉发",
+      "label": "掉发",
+      "primary_type": "全身症状",
+      "centrality_strength": 0.506544,
+      "frequency": 745
+    },
+    {
+      "id": "感到无法控制焦虑",
+      "label": "感到无法控制焦虑",
+      "primary_type": "心理症状",
+      "centrality_strength": 0.917601,
+      "frequency": 602
+    },
+    {
+      "id": "感到紧张或焦虑",
+      "label": "感到紧张或焦虑",
+      "primary_type": "心理症状",
+      "centrality_strength": 0.994385,
+      "frequency": 716
+    },
+    {
+      "id": "做事提不起兴趣",
+      "label": "做事提不起兴趣",
+      "primary_type": "心理症状",
+      "centrality_strength": 0.919657,
+      "frequency": 804
+    },
+    {
+      "id": "感到心情低落",
+      "label": "感到心情低落",
+      "primary_type": "心理症状",
+      "centrality_strength": 0.841441,
+      "frequency": 773
+    }
+  ],
+  "edges": [
+    {
+      "id": "e0",
+      "source": "疲乏",
+      "target": "头晕",
+      "weight": 0.178135,
+      "is_negative": false
+    },
+    {
+      "id": "e1",
+      "source": "疲乏",
+      "target": "头痛",
+      "weight": 0.042954,
+      "is_negative": false
+    },
+    {
+      "id": "e2",
+      "source": "疲乏",
+      "target": "发热",
+      "weight": 0.093859,
+      "is_negative": false
+    },
+    {
+      "id": "e3",
+      "source": "疲乏",
+      "target": "注意力难以集中",
+      "weight": 0.054629,
+      "is_negative": false
+    },
+    {
+      "id": "e4",
+      "source": "疲乏",
+      "target": "反应变慢",
+      "weight": 0.060617,
+      "is_negative": false
+    },
+    {
+      "id": "e5",
+      "source": "疲乏",
+      "target": "嗜睡或难以入睡",
+      "weight": 0.081701,
+      "is_negative": false
+    },
+    {
+      "id": "e6",
+      "source": "疲乏",
+      "target": "食欲下降",
+      "weight": 0.111017,
+      "is_negative": false
+    },
+    {
+      "id": "e7",
+      "source": "疲乏",
+      "target": "腹胀腹痛腹泻",
+      "weight": 0.067223,
+      "is_negative": false
+    },
+    {
+      "id": "e8",
+      "source": "疲乏",
+      "target": "消瘦体重减轻",
+      "weight": 0.038745,
+      "is_negative": false
+    },
+    {
+      "id": "e9",
+      "source": "疲乏",
+      "target": "性欲下降",
+      "weight": 0.070917,
+      "is_negative": false
+    },
+    {
+      "id": "e10",
+      "source": "疲乏",
+      "target": "感到无法控制焦虑",
+      "weight": 0.030921,
+      "is_negative": false
+    },
+    {
+      "id": "e11",
+      "source": "疲乏",
+      "target": "做事提不起兴趣",
+      "weight": 0.13175,
+      "is_negative": false
+    },
+    {
+      "id": "e12",
+      "source": "疲乏",
+      "target": "感到心情低落",
+      "weight": 0.030944,
+      "is_negative": false
+    },
+    {
+      "id": "e13",
+      "source": "头晕",
+      "target": "头痛",
+      "weight": 0.329489,
+      "is_negative": false
+    },
+    {
+      "id": "e14",
+      "source": "头晕",
+      "target": "注意力难以集中",
+      "weight": 0.064651,
+      "is_negative": false
+    },
+    {
+      "id": "e15",
+      "source": "头晕",
+      "target": "反应变慢",
+      "weight": 0.039987,
+      "is_negative": false
+    },
+    {
+      "id": "e16",
+      "source": "头晕",
+      "target": "变得更加糊涂",
+      "weight": 0.057155,
+      "is_negative": false
+    },
+    {
+      "id": "e17",
+      "source": "头晕",
+      "target": "视力模糊",
+      "weight": 0.063106,
+      "is_negative": false
+    },
+    {
+      "id": "e18",
+      "source": "头晕",
+      "target": "恶心呕吐",
+      "weight": 0.069277,
+      "is_negative": false
+    },
+    {
+      "id": "e19",
+      "source": "头晕",
+      "target": "感到紧张或焦虑",
+      "weight": 0.046814,
+      "is_negative": false
+    },
+    {
+      "id": "e20",
+      "source": "头痛",
+      "target": "发热",
+      "weight": 0.171348,
+      "is_negative": false
+    },
+    {
+      "id": "e21",
+      "source": "头痛",
+      "target": "理解上存在困难",
+      "weight": 0.035771,
+      "is_negative": false
+    },
+    {
+      "id": "e22",
+      "source": "头痛",
+      "target": "变得更加糊涂",
+      "weight": 0.030979,
+      "is_negative": false
+    },
+    {
+      "id": "e23",
+      "source": "头痛",
+      "target": "嗜睡或难以入睡",
+      "weight": 0.031555,
+      "is_negative": false
+    },
+    {
+      "id": "e24",
+      "source": "头痛",
+      "target": "肌肉关节疼痛",
+      "weight": 0.052896,
+      "is_negative": false
+    },
+    {
+      "id": "e25",
+      "source": "头痛",
+      "target": "手脚发麻",
+      "weight": 0.039932,
+      "is_negative": false
+    },
+    {
+      "id": "e26",
+      "source": "头痛",
+      "target": "恶心呕吐",
+      "weight": 0.076839,
+      "is_negative": false
+    },
+    {
+      "id": "e27",
+      "source": "发热",
+      "target": "咳嗽",
+      "weight": 0.138539,
+      "is_negative": false
+    },
+    {
+      "id": "e28",
+      "source": "发热",
+      "target": "嗜睡或难以入睡",
+      "weight": 0.044538,
+      "is_negative": false
+    },
+    {
+      "id": "e29",
+      "source": "发热",
+      "target": "皮疹",
+      "weight": 0.081177,
+      "is_negative": false
+    },
+    {
+      "id": "e30",
+      "source": "发热",
+      "target": "口腔溃疡",
+      "weight": 0.047348,
+      "is_negative": false
+    },
+    {
+      "id": "e31",
+      "source": "发热",
+      "target": "肌肉关节疼痛",
+      "weight": 0.07169,
+      "is_negative": false
+    },
+    {
+      "id": "e32",
+      "source": "发热",
+      "target": "食欲下降",
+      "weight": 0.090243,
+      "is_negative": false
+    },
+    {
+      "id": "e33",
+      "source": "发热",
+      "target": "消瘦体重减轻",
+      "weight": 0.09831,
+      "is_negative": false
+    },
+    {
+      "id": "e34",
+      "source": "注意力难以集中",
+      "target": "反应变慢",
+      "weight": 0.321705,
+      "is_negative": false
+    },
+    {
+      "id": "e35",
+      "source": "注意力难以集中",
+      "target": "健忘",
+      "weight": 0.111978,
+      "is_negative": false
+    },
+    {
+      "id": "e36",
+      "source": "注意力难以集中",
+      "target": "理解上存在困难",
+      "weight": 0.10197,
+      "is_negative": false
+    },
+    {
+      "id": "e37",
+      "source": "注意力难以集中",
+      "target": "变得更加糊涂",
+      "weight": 0.079727,
+      "is_negative": false
+    },
+    {
+      "id": "e38",
+      "source": "注意力难以集中",
+      "target": "手脚发麻",
+      "weight": 0.056429,
+      "is_negative": false
+    },
+    {
+      "id": "e39",
+      "source": "注意力难以集中",
+      "target": "腹胀腹痛腹泻",
+      "weight": 0.060458,
+      "is_negative": false
+    },
+    {
+      "id": "e40",
+      "source": "注意力难以集中",
+      "target": "性欲下降",
+      "weight": 0.046453,
+      "is_negative": false
+    },
+    {
+      "id": "e41",
+      "source": "注意力难以集中",
+      "target": "做事提不起兴趣",
+      "weight": 0.035528,
+      "is_negative": false
+    },
+    {
+      "id": "e42",
+      "source": "反应变慢",
+      "target": "健忘",
+      "weight": 0.298267,
+      "is_negative": false
+    },
+    {
+      "id": "e43",
+      "source": "反应变慢",
+      "target": "理解上存在困难",
+      "weight": 0.127085,
+      "is_negative": false
+    },
+    {
+      "id": "e44",
+      "source": "反应变慢",
+      "target": "变得更加糊涂",
+      "weight": 0.081785,
+      "is_negative": false
+    },
+    {
+      "id": "e45",
+      "source": "反应变慢",
+      "target": "视力模糊",
+      "weight": 0.046012,
+      "is_negative": false
+    },
+    {
+      "id": "e46",
+      "source": "反应变慢",
+      "target": "性欲下降",
+      "weight": 0.043076,
+      "is_negative": false
+    },
+    {
+      "id": "e47",
+      "source": "反应变慢",
+      "target": "做事提不起兴趣",
+      "weight": 0.083734,
+      "is_negative": false
+    },
+    {
+      "id": "e48",
+      "source": "健忘",
+      "target": "理解上存在困难",
+      "weight": 0.1247,
+      "is_negative": false
+    },
+    {
+      "id": "e49",
+      "source": "健忘",
+      "target": "变得更加糊涂",
+      "weight": 0.125586,
+      "is_negative": false
+    },
+    {
+      "id": "e50",
+      "source": "健忘",
+      "target": "嗜睡或难以入睡",
+      "weight": 0.092244,
+      "is_negative": false
+    },
+    {
+      "id": "e51",
+      "source": "健忘",
+      "target": "视力模糊",
+      "weight": 0.037708,
+      "is_negative": false
+    },
+    {
+      "id": "e52",
+      "source": "健忘",
+      "target": "腹胀腹痛腹泻",
+      "weight": 0.063878,
+      "is_negative": false
+    },
+    {
+      "id": "e53",
+      "source": "健忘",
+      "target": "脂肪堆积",
+      "weight": 0.033718,
+      "is_negative": false
+    },
+    {
+      "id": "e54",
+      "source": "健忘",
+      "target": "掉发",
+      "weight": 0.073194,
+      "is_negative": false
+    },
+    {
+      "id": "e55",
+      "source": "理解上存在困难",
+      "target": "变得更加糊涂",
+      "weight": 0.363836,
+      "is_negative": false
+    },
+    {
+      "id": "e56",
+      "source": "理解上存在困难",
+      "target": "口腔溃疡",
+      "weight": 0.041155,
+      "is_negative": false
+    },
+    {
+      "id": "e57",
+      "source": "理解上存在困难",
+      "target": "脂肪堆积",
+      "weight": 0.058689,
+      "is_negative": false
+    },
+    {
+      "id": "e58",
+      "source": "理解上存在困难",
+      "target": "感到紧张或焦虑",
+      "weight": 0.035735,
+      "is_negative": false
+    },
+    {
+      "id": "e59",
+      "source": "变得更加糊涂",
+      "target": "视力模糊",
+      "weight": 0.109705,
+      "is_negative": false
+    },
+    {
+      "id": "e60",
+      "source": "变得更加糊涂",
+      "target": "口腔溃疡",
+      "weight": 0.037303,
+      "is_negative": false
+    },
+    {
+      "id": "e61",
+      "source": "变得更加糊涂",
+      "target": "肌肉关节疼痛",
+      "weight": 0.054041,
+      "is_negative": false
+    },
+    {
+      "id": "e62",
+      "source": "咳嗽",
+      "target": "嗜睡或难以入睡",
+      "weight": 0.053019,
+      "is_negative": false
+    },
+    {
+      "id": "e63",
+      "source": "咳嗽",
+      "target": "皮疹",
+      "weight": 0.037747,
+      "is_negative": false
+    },
+    {
+      "id": "e64",
+      "source": "咳嗽",
+      "target": "口腔溃疡",
+      "weight": 0.076678,
+      "is_negative": false
+    },
+    {
+      "id": "e65",
+      "source": "咳嗽",
+      "target": "手脚发麻",
+      "weight": 0.032554,
+      "is_negative": false
+    },
+    {
+      "id": "e66",
+      "source": "咳嗽",
+      "target": "食欲下降",
+      "weight": 0.067643,
+      "is_negative": false
+    },
+    {
+      "id": "e67",
+      "source": "咳嗽",
+      "target": "恶心呕吐",
+      "weight": 0.036107,
+      "is_negative": false
+    },
+    {
+      "id": "e68",
+      "source": "咳嗽",
+      "target": "脂肪堆积",
+      "weight": 0.030456,
+      "is_negative": false
+    },
+    {
+      "id": "e69",
+      "source": "嗜睡或难以入睡",
+      "target": "视力模糊",
+      "weight": 0.094632,
+      "is_negative": false
+    },
+    {
+      "id": "e70",
+      "source": "嗜睡或难以入睡",
+      "target": "肌肉关节疼痛",
+      "weight": 0.08557,
+      "is_negative": false
+    },
+    {
+      "id": "e71",
+      "source": "嗜睡或难以入睡",
+      "target": "消瘦体重减轻",
+      "weight": 0.042556,
+      "is_negative": false
+    },
+    {
+      "id": "e72",
+      "source": "嗜睡或难以入睡",
+      "target": "掉发",
+      "weight": 0.068966,
+      "is_negative": false
+    },
+    {
+      "id": "e73",
+      "source": "嗜睡或难以入睡",
+      "target": "感到无法控制焦虑",
+      "weight": 0.057232,
+      "is_negative": false
+    },
+    {
+      "id": "e74",
+      "source": "视力模糊",
+      "target": "皮疹",
+      "weight": 0.060181,
+      "is_negative": false
+    },
+    {
+      "id": "e75",
+      "source": "视力模糊",
+      "target": "口腔溃疡",
+      "weight": 0.03091,
+      "is_negative": false
+    },
+    {
+      "id": "e76",
+      "source": "视力模糊",
+      "target": "手脚发麻",
+      "weight": 0.138124,
+      "is_negative": false
+    },
+    {
+      "id": "e77",
+      "source": "视力模糊",
+      "target": "脂肪堆积",
+      "weight": 0.049172,
+      "is_negative": false
+    },
+    {
+      "id": "e78",
+      "source": "视力模糊",
+      "target": "掉发",
+      "weight": 0.032372,
+      "is_negative": false
+    },
+    {
+      "id": "e79",
+      "source": "视力模糊",
+      "target": "感到心情低落",
+      "weight": 0.030082,
+      "is_negative": false
+    },
+    {
+      "id": "e80",
+      "source": "皮疹",
+      "target": "口腔溃疡",
+      "weight": 0.116487,
+      "is_negative": false
+    },
+    {
+      "id": "e81",
+      "source": "皮疹",
+      "target": "肌肉关节疼痛",
+      "weight": 0.0577,
+      "is_negative": false
+    },
+    {
+      "id": "e82",
+      "source": "皮疹",
+      "target": "腹胀腹痛腹泻",
+      "weight": 0.054206,
+      "is_negative": false
+    },
+    {
+      "id": "e83",
+      "source": "皮疹",
+      "target": "恶心呕吐",
+      "weight": 0.045254,
+      "is_negative": false
+    },
+    {
+      "id": "e84",
+      "source": "皮疹",
+      "target": "脂肪堆积",
+      "weight": 0.043009,
+      "is_negative": false
+    },
+    {
+      "id": "e85",
+      "source": "皮疹",
+      "target": "消瘦体重减轻",
+      "weight": 0.030785,
+      "is_negative": false
+    },
+    {
+      "id": "e86",
+      "source": "皮疹",
+      "target": "性欲下降",
+      "weight": 0.06945,
+      "is_negative": false
+    },
+    {
+      "id": "e87",
+      "source": "皮疹",
+      "target": "掉发",
+      "weight": 0.061767,
+      "is_negative": false
+    },
+    {
+      "id": "e88",
+      "source": "皮疹",
+      "target": "感到无法控制焦虑",
+      "weight": 0.040591,
+      "is_negative": false
+    },
+    {
+      "id": "e89",
+      "source": "口腔溃疡",
+      "target": "手脚发麻",
+      "weight": 0.061587,
+      "is_negative": false
+    },
+    {
+      "id": "e90",
+      "source": "口腔溃疡",
+      "target": "腹胀腹痛腹泻",
+      "weight": 0.034806,
+      "is_negative": false
+    },
+    {
+      "id": "e91",
+      "source": "口腔溃疡",
+      "target": "脂肪堆积",
+      "weight": 0.046225,
+      "is_negative": false
+    },
+    {
+      "id": "e92",
+      "source": "口腔溃疡",
+      "target": "消瘦体重减轻",
+      "weight": 0.062426,
+      "is_negative": false
+    },
+    {
+      "id": "e93",
+      "source": "口腔溃疡",
+      "target": "感到心情低落",
+      "weight": 0.065159,
+      "is_negative": false
+    },
+    {
+      "id": "e94",
+      "source": "肌肉关节疼痛",
+      "target": "手脚发麻",
+      "weight": 0.333196,
+      "is_negative": false
+    },
+    {
+      "id": "e95",
+      "source": "肌肉关节疼痛",
+      "target": "腹胀腹痛腹泻",
+      "weight": 0.061248,
+      "is_negative": false
+    },
+    {
+      "id": "e96",
+      "source": "肌肉关节疼痛",
+      "target": "恶心呕吐",
+      "weight": 0.036953,
+      "is_negative": false
+    },
+    {
+      "id": "e97",
+      "source": "肌肉关节疼痛",
+      "target": "感到无法控制焦虑",
+      "weight": 0.038613,
+      "is_negative": false
+    },
+    {
+      "id": "e98",
+      "source": "手脚发麻",
+      "target": "腹胀腹痛腹泻",
+      "weight": 0.033741,
+      "is_negative": false
+    },
+    {
+      "id": "e99",
+      "source": "手脚发麻",
+      "target": "性欲下降",
+      "weight": 0.0351,
+      "is_negative": false
+    },
+    {
+      "id": "e100",
+      "source": "手脚发麻",
+      "target": "掉发",
+      "weight": 0.041243,
+      "is_negative": false
+    },
+    {
+      "id": "e101",
+      "source": "食欲下降",
+      "target": "腹胀腹痛腹泻",
+      "weight": 0.127213,
+      "is_negative": false
+    },
+    {
+      "id": "e102",
+      "source": "食欲下降",
+      "target": "恶心呕吐",
+      "weight": 0.245786,
+      "is_negative": false
+    },
+    {
+      "id": "e103",
+      "source": "食欲下降",
+      "target": "消瘦体重减轻",
+      "weight": 0.276848,
+      "is_negative": false
+    },
+    {
+      "id": "e104",
+      "source": "食欲下降",
+      "target": "性欲下降",
+      "weight": 0.035703,
+      "is_negative": false
+    },
+    {
+      "id": "e105",
+      "source": "食欲下降",
+      "target": "做事提不起兴趣",
+      "weight": 0.032741,
+      "is_negative": false
+    },
+    {
+      "id": "e106",
+      "source": "食欲下降",
+      "target": "感到心情低落",
+      "weight": 0.083053,
+      "is_negative": false
+    },
+    {
+      "id": "e107",
+      "source": "腹胀腹痛腹泻",
+      "target": "恶心呕吐",
+      "weight": 0.185551,
+      "is_negative": false
+    },
+    {
+      "id": "e108",
+      "source": "腹胀腹痛腹泻",
+      "target": "脂肪堆积",
+      "weight": 0.043128,
+      "is_negative": false
+    },
+    {
+      "id": "e109",
+      "source": "腹胀腹痛腹泻",
+      "target": "消瘦体重减轻",
+      "weight": 0.04567,
+      "is_negative": false
+    },
+    {
+      "id": "e110",
+      "source": "腹胀腹痛腹泻",
+      "target": "掉发",
+      "weight": 0.063105,
+      "is_negative": false
+    },
+    {
+      "id": "e111",
+      "source": "恶心呕吐",
+      "target": "脂肪堆积",
+      "weight": 0.04134,
+      "is_negative": false
+    },
+    {
+      "id": "e112",
+      "source": "恶心呕吐",
+      "target": "性欲下降",
+      "weight": 0.036659,
+      "is_negative": false
+    },
+    {
+      "id": "e113",
+      "source": "脂肪堆积",
+      "target": "消瘦体重减轻",
+      "weight": -0.125232,
+      "is_negative": true
+    },
+    {
+      "id": "e114",
+      "source": "脂肪堆积",
+      "target": "性欲下降",
+      "weight": 0.061514,
+      "is_negative": false
+    },
+    {
+      "id": "e115",
+      "source": "脂肪堆积",
+      "target": "掉发",
+      "weight": 0.047521,
+      "is_negative": false
+    },
+    {
+      "id": "e116",
+      "source": "脂肪堆积",
+      "target": "感到紧张或焦虑",
+      "weight": 0.03547,
+      "is_negative": false
+    },
+    {
+      "id": "e117",
+      "source": "消瘦体重减轻",
+      "target": "性欲下降",
+      "weight": 0.158775,
+      "is_negative": false
+    },
+    {
+      "id": "e118",
+      "source": "消瘦体重减轻",
+      "target": "掉发",
+      "weight": 0.07351,
+      "is_negative": false
+    },
+    {
+      "id": "e119",
+      "source": "消瘦体重减轻",
+      "target": "做事提不起兴趣",
+      "weight": 0.037624,
+      "is_negative": false
+    },
+    {
+      "id": "e120",
+      "source": "性欲下降",
+      "target": "掉发",
+      "weight": 0.044866,
+      "is_negative": false
+    },
+    {
+      "id": "e121",
+      "source": "性欲下降",
+      "target": "感到无法控制焦虑",
+      "weight": 0.031197,
+      "is_negative": false
+    },
+    {
+      "id": "e122",
+      "source": "性欲下降",
+      "target": "做事提不起兴趣",
+      "weight": 0.058312,
+      "is_negative": false
+    },
+    {
+      "id": "e123",
+      "source": "性欲下降",
+      "target": "感到心情低落",
+      "weight": 0.037561,
+      "is_negative": false
+    },
+    {
+      "id": "e124",
+      "source": "感到无法控制焦虑",
+      "target": "感到紧张或焦虑",
+      "weight": 0.49761,
+      "is_negative": false
+    },
+    {
+      "id": "e125",
+      "source": "感到无法控制焦虑",
+      "target": "做事提不起兴趣",
+      "weight": 0.103096,
+      "is_negative": false
+    },
+    {
+      "id": "e126",
+      "source": "感到无法控制焦虑",
+      "target": "感到心情低落",
+      "weight": 0.118341,
+      "is_negative": false
+    },
+    {
+      "id": "e127",
+      "source": "感到紧张或焦虑",
+      "target": "做事提不起兴趣",
+      "weight": 0.169664,
+      "is_negative": false
+    },
+    {
+      "id": "e128",
+      "source": "感到紧张或焦虑",
+      "target": "感到心情低落",
+      "weight": 0.209092,
+      "is_negative": false
+    },
+    {
+      "id": "e129",
+      "source": "做事提不起兴趣",
+      "target": "感到心情低落",
+      "weight": 0.267209,
+      "is_negative": false
+    }
+  ],
+  "groups": {
+    "全身症状": {
+      "count": 7,
+      "color": "#0072B2"
+    },
+    "神经症状": {
+      "count": 2,
+      "color": "#F0E442"
+    },
+    "消化症状": {
+      "count": 5,
+      "color": "#009E73"
+    },
+    "认知症状": {
+      "count": 5,
+      "color": "#E69F00"
+    },
+    "皮肤关节症状": {
+      "count": 4,
+      "color": "#CC79A7"
+    },
+    "心理症状": {
+      "count": 4,
+      "color": "#56B4E9"
+    }
+  },
+  "stats": {
+    "node_count": 27,
+    "edge_count": 130
+  }
+}

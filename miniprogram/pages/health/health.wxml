@@ -1,0 +1,741 @@
+<view class="container health-page">
+  <view class="card intro-card">
+    <view class="intro-head">
+      <text class="intro-title">每日健康管理</text>
+      <button class="intro-notify-btn" size="mini" bindtap="goNotification">🔔 消息通知</button>
+    </view>
+    <text class="intro-desc">用药、复诊、运动、饮食四类记录统一管理。</text>
+  </view>
+
+  <!-- 未登录引导 -->
+  <view class="card login-guard" wx:if="{{!isLogin}}">
+    <text class="login-guard-icon">🔒</text>
+    <text class="login-guard-title">登录后使用健康管理</text>
+    <text class="login-guard-desc">用药复诊提醒、运动饮食记录、热量计算等功能需登录后使用</text>
+    <button class="login-guard-btn" bindtap="goLogin">去登录</button>
+  </view>
+
+  <view class="tab-row" wx:if="{{isLogin}}">
+    <view
+      class="tab-item {{activeTab === item.key ? 'active' : ''}}"
+      wx:for="{{tabs}}"
+      wx:key="key"
+      data-key="{{item.key}}"
+      bindtap="onTabTap"
+    >
+      {{item.label}}
+    </view>
+  </view>
+
+  <view class="card reminder-card" wx:if="{{isLogin && reminderList.length}}">
+    <view class="reminder-head">
+      <text class="reminder-title">今日提醒</text>
+      <text class="reminder-more" bindtap="goNotification">查看全部 ›</text>
+    </view>
+    <view class="reminder-item" wx:for="{{reminderList}}" wx:key="key">
+      <text class="reminder-dot {{item.type === 'appointment' ? 'appt' : ''}}"></text>
+      <view class="reminder-body">
+        <text class="reminder-name">{{item.title}}</text>
+        <text class="reminder-desc">{{item.desc}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{isLogin}}" hidden="{{activeTab !== 'medication'}}">
+    <view class="card head-card">
+      <text class="section-title">用药提醒</text>
+      <button class="head-btn" size="mini" data-key="showMedicationForm" bindtap="onToggleForm">
+        {{showMedicationForm ? '收起' : '添加'}}
+      </button>
+    </view>
+
+    <view class="card form-card" wx:if="{{showMedicationForm}}">
+      <view class="field-block">
+        <text class="field-label">药名</text>
+        <input
+          class="field-input"
+          placeholder="例如：替诺福韦"
+          value="{{medicationForm.name}}"
+          data-form="medicationForm"
+          data-field="name"
+          bindinput="onInputChange"
+        />
+      </view>
+
+      <view class="field-block">
+        <text class="field-label">剂量</text>
+        <input
+          class="field-input"
+          placeholder="例如：300mg"
+          value="{{medicationForm.dosage}}"
+          data-form="medicationForm"
+          data-field="dosage"
+          bindinput="onInputChange"
+        />
+      </view>
+
+      <view class="field-block">
+        <text class="field-label">频率</text>
+        <picker
+          mode="selector"
+          range="{{frequencyOptions}}"
+          value="{{medicationForm.frequencyIndex}}"
+          bindchange="onFrequencyChange"
+        >
+          <view class="field-picker">{{medicationForm.frequencyLabel}}</view>
+        </picker>
+      </view>
+
+      <view class="field-block">
+        <text class="field-label">提醒时间</text>
+        <picker
+          mode="time"
+          value="08:00"
+          bindchange="onAddMedTime"
+        >
+          <view class="time-add-btn">+ 添加提醒时间</view>
+        </picker>
+        <view class="time-chip-row" wx:if="{{medicationForm.times.length}}">
+          <view class="time-chip" wx:for="{{medicationForm.times}}" wx:key="*this">
+            <text class="time-chip-text">{{item}}</text>
+            <text class="time-chip-remove" data-time="{{item}}" bindtap="onRemoveMedTime">×</text>
+          </view>
+        </view>
+        <text class="field-hint" wx:else>请至少添加一个提醒时间</text>
+      </view>
+
+      <view class="field-inline">
+        <view class="field-inline-item">
+          <text class="field-label">开始日期</text>
+          <picker
+            mode="date"
+            value="{{medicationForm.startDate}}"
+            data-form="medicationForm"
+            data-field="startDate"
+            bindchange="onDateChange"
+          >
+            <view class="field-picker">{{medicationForm.startDate || '选择日期'}}</view>
+          </picker>
+        </view>
+
+        <view class="field-inline-item">
+          <text class="field-label">结束日期（可选）</text>
+          <picker
+            mode="date"
+            value="{{medicationForm.endDate}}"
+            data-form="medicationForm"
+            data-field="endDate"
+            bindchange="onDateChange"
+          >
+            <view class="field-picker">{{medicationForm.endDate || '长期'}}</view>
+          </picker>
+        </view>
+      </view>
+
+      <view class="field-actions">
+        <button class="clear-btn" size="mini" bindtap="onClearMedicationEndDate">清空结束日期</button>
+      </view>
+
+      <view class="field-block">
+        <text class="field-label">备注（可选）</text>
+        <textarea
+          class="field-textarea"
+          placeholder="填写补充说明"
+          value="{{medicationForm.notes}}"
+          data-form="medicationForm"
+          data-field="notes"
+          bindinput="onInputChange"
+          maxlength="120"
+        />
+      </view>
+
+      <button class="btn-primary submit-btn" bindtap="onSubmitMedication">保存用药提醒</button>
+    </view>
+
+    <view class="state-box" wx:if="{{medicationLoading}}">正在加载用药提醒...</view>
+    <view class="state-box empty" wx:if="{{!medicationLoading && !medicationList.length}}">暂无用药提醒，点击上方“添加”开始记录。</view>
+
+    <view class="card item-card" wx:for="{{medicationList}}" wx:key="id">
+      <view class="item-head">
+        <text class="item-title">{{item.name}}</text>
+        <text class="item-sub">{{item.dosage}}</text>
+      </view>
+      <text class="item-line">频率：{{item.frequency}}</text>
+      <text class="item-line">时间：{{item.timesText}}</text>
+      <text class="item-line">周期：{{item.periodText}}</text>
+      <text class="item-note" wx:if="{{item.notes}}">备注：{{item.notes}}</text>
+      <!-- 按提醒时间逐条打卡（与通知中心统一） -->
+      <view class="reminder-chips" wx:if="{{item.reminders.length}}">
+        <view class="reminder-chip {{r.taken ? 'taken' : ''}}" wx:for="{{item.reminders}}" wx:for-item="r" wx:key="reminderId"
+              data-reminder-id="{{r.reminderId}}" data-medication-id="{{item.id}}"
+              bindtap="{{r.taken ? '' : 'onMedicationTaken'}}">
+          <text class="reminder-chip-time">{{r.time}}</text>
+          <text class="reminder-chip-status">{{r.taken ? '已服 ✓' : '点击打卡'}}</text>
+        </view>
+      </view>
+      <view class="item-actions">
+        <button class="mini-btn danger" size="mini" data-id="{{item.id}}" bindtap="onDeleteMedication">删除</button>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{isLogin}}" hidden="{{activeTab !== 'appointment'}}">
+    <view class="card head-card">
+      <text class="section-title">复诊提醒</text>
+      <button class="head-btn" size="mini" data-key="showAppointmentForm" bindtap="onToggleForm">
+        {{showAppointmentForm ? '收起' : '添加'}}
+      </button>
+    </view>
+
+    <view class="card form-card" wx:if="{{showAppointmentForm}}">
+      <view class="field-block">
+        <text class="field-label">医生</text>
+        <input
+          class="field-input"
+          placeholder="例如：张医生"
+          value="{{appointmentForm.doctor}}"
+          data-form="appointmentForm"
+          data-field="doctor"
+          bindinput="onInputChange"
+        />
+      </view>
+
+      <view class="field-block">
+        <text class="field-label">医院</text>
+        <input
+          class="field-input"
+          placeholder="例如：复旦大学附属医院"
+          value="{{appointmentForm.hospital}}"
+          data-form="appointmentForm"
+          data-field="hospital"
+          bindinput="onInputChange"
+        />
+      </view>
+
+      <view class="field-inline">
+        <view class="field-inline-item">
+          <text class="field-label">日期</text>
+          <picker
+            mode="date"
+            value="{{appointmentForm.date}}"
+            data-form="appointmentForm"
+            data-field="date"
+            bindchange="onDateChange"
+          >
+            <view class="field-picker">{{appointmentForm.date}}</view>
+          </picker>
+        </view>
+
+        <view class="field-inline-item">
+          <text class="field-label">时间</text>
+          <picker
+            mode="time"
+            value="{{appointmentForm.time}}"
+            data-form="appointmentForm"
+            data-field="time"
+            bindchange="onTimeChange"
+          >
+            <view class="field-picker">{{appointmentForm.time}}</view>
+          </picker>
+        </view>
+      </view>
+
+      <view class="field-block">
+        <text class="field-label">科室</text>
+        <input
+          class="field-input"
+          placeholder="例如：感染科"
+          value="{{appointmentForm.department}}"
+          data-form="appointmentForm"
+          data-field="department"
+          bindinput="onInputChange"
+        />
+      </view>
+
+      <view class="field-block">
+        <text class="field-label">提前提醒</text>
+        <picker
+          mode="selector"
+          range="{{appointmentReminderOptions}}"
+          value="{{appointmentForm.reminderDaysIndex}}"
+          bindchange="onAppointmentReminderChange"
+        >
+          <view class="field-picker">{{appointmentReminderOptions[appointmentForm.reminderDaysIndex]}}</view>
+        </picker>
+      </view>
+
+      <view class="field-block">
+        <text class="field-label">备注（可选）</text>
+        <textarea
+          class="field-textarea"
+          placeholder="填写复诊注意事项"
+          value="{{appointmentForm.notes}}"
+          data-form="appointmentForm"
+          data-field="notes"
+          bindinput="onInputChange"
+          maxlength="120"
+        />
+      </view>
+
+      <button class="btn-primary submit-btn" bindtap="onSubmitAppointment">保存复诊提醒</button>
+    </view>
+
+    <view class="state-box" wx:if="{{appointmentLoading}}">正在加载复诊提醒...</view>
+    <view class="state-box empty" wx:if="{{!appointmentLoading && !appointmentList.length}}">暂无未来复诊安排，点击上方“添加”。</view>
+
+    <view class="card item-card" wx:for="{{appointmentList}}" wx:key="id">
+      <view class="item-head">
+        <text class="item-title">{{item.doctor}}</text>
+        <text class="item-sub" wx:if="{{item.isCompleted}}">已完成</text>
+        <text class="item-sub" wx:else>{{item.department}}</text>
+      </view>
+      <text class="item-line">医院：{{item.hospital}}</text>
+      <text class="item-line">时间：{{item.datetimeText}}</text>
+      <text class="item-line">提前提醒：{{item.reminderDays}} 天</text>
+      <text class="item-note" wx:if="{{item.notes}}">备注：{{item.notes}}</text>
+      <view class="item-actions">
+        <text class="done-tag" wx:if="{{item.isCompleted}}">已完成</text>
+        <button class="mini-btn primary" size="mini" wx:else data-id="{{item.id}}" bindtap="onCompleteAppointment">标记完成</button>
+        <button class="mini-btn danger" size="mini" data-id="{{item.id}}" bindtap="onDeleteAppointment">删除</button>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{isLogin}}" hidden="{{activeTab !== 'exercise'}}">
+    <view class="card stats-card">
+      <view class="stats-row">
+        <view class="stats-item">
+          <text class="stats-label">本周总时长</text>
+          <text class="stats-value">{{exerciseStats.week.totalDuration}} 分钟</text>
+        </view>
+        <view class="stats-item">
+          <text class="stats-label">本周次数</text>
+          <text class="stats-value">{{exerciseStats.week.count}} 次</text>
+        </view>
+      </view>
+      <view class="stats-row compact">
+        <text class="stats-sub">本月总时长 {{exerciseStats.month.totalDuration}} 分钟</text>
+        <text class="stats-sub">本月次数 {{exerciseStats.month.count}} 次</text>
+      </view>
+    </view>
+
+    <view class="card head-card">
+      <text class="section-title">运动记录</text>
+      <button class="head-btn" size="mini" data-key="showExerciseForm" bindtap="onToggleForm">
+        {{showExerciseForm ? '收起' : '添加'}}
+      </button>
+    </view>
+
+    <view class="card form-card" wx:if="{{showExerciseForm}}">
+      <view class="field-block">
+        <text class="field-label">运动类型</text>
+        <input
+          class="field-input"
+          placeholder="例如：快走 / 骑行"
+          value="{{exerciseForm.type}}"
+          data-form="exerciseForm"
+          data-field="type"
+          bindinput="onInputChange"
+        />
+      </view>
+
+      <view class="field-block">
+        <text class="field-label">时长（分钟）</text>
+        <input
+          class="field-input"
+          type="digit"
+          placeholder="例如：30"
+          value="{{exerciseForm.durationMin}}"
+          data-form="exerciseForm"
+          data-field="durationMin"
+          bindinput="onInputChange"
+        />
+      </view>
+
+      <view class="field-inline">
+        <view class="field-inline-item">
+          <text class="field-label">强度</text>
+          <picker
+            mode="selector"
+            range="{{intensityOptions}}"
+            value="{{exerciseForm.intensityIndex}}"
+            data-form="exerciseForm"
+            data-index-field="intensityIndex"
+            data-label-field="intensityLabel"
+            data-option-key="intensityOptions"
+            bindchange="onPickerIndexChange"
+          >
+            <view class="field-picker">{{exerciseForm.intensityLabel}}</view>
+          </picker>
+        </view>
+
+        <view class="field-inline-item">
+          <text class="field-label">日期</text>
+          <picker
+            mode="date"
+            value="{{exerciseForm.date}}"
+            data-form="exerciseForm"
+            data-field="date"
+            bindchange="onDateChange"
+          >
+            <view class="field-picker">{{exerciseForm.date}}</view>
+          </picker>
+        </view>
+      </view>
+
+      <view class="field-block">
+        <text class="field-label">备注（可选）</text>
+        <textarea
+          class="field-textarea"
+          placeholder="记录运动感受"
+          value="{{exerciseForm.notes}}"
+          data-form="exerciseForm"
+          data-field="notes"
+          bindinput="onInputChange"
+          maxlength="120"
+        />
+      </view>
+
+      <button class="btn-primary submit-btn" bindtap="onSubmitExercise">保存运动记录</button>
+    </view>
+
+    <view class="state-box" wx:if="{{exerciseLoading}}">正在加载运动记录...</view>
+    <view class="state-box empty" wx:if="{{!exerciseLoading && !exerciseList.length}}">暂无运动记录，点击上方“添加”。</view>
+
+    <view class="card item-card" wx:for="{{exerciseList}}" wx:key="id">
+      <view class="item-head">
+        <text class="item-title">{{item.type}}</text>
+        <text class="intensity-tag {{item.intensityClass}}">{{item.intensity}}</text>
+      </view>
+      <text class="item-line">时长：{{item.durationText}}</text>
+      <text class="item-line">日期：{{item.date}}</text>
+      <text class="item-note" wx:if="{{item.notes}}">备注：{{item.notes}}</text>
+      <view class="item-actions">
+        <button class="mini-btn danger" size="mini" data-id="{{item.id}}" bindtap="onDeleteExercise">删除</button>
+      </view>
+    </view>
+
+    <button
+      class="load-more-btn"
+      wx:if="{{exerciseHasMore && !exerciseLoading}}"
+      bindtap="onLoadMoreExercise"
+      loading="{{exerciseLoadingMore}}"
+      disabled="{{exerciseLoadingMore}}"
+    >
+      加载更多
+    </button>
+  </view>
+
+  <view wx:if="{{isLogin}}" hidden="{{activeTab !== 'diet'}}">
+    <view class="card stats-card">
+      <view class="stats-row">
+        <view class="stats-item">
+          <text class="stats-label">今日已记录餐次</text>
+          <text class="stats-value">{{dietStats.completed}} / {{dietStats.total}}</text>
+        </view>
+        <view class="stats-item stats-date">{{dietStats.date}}</view>
+      </view>
+      <view class="meal-status-row">
+        <view class="meal-chip {{item.done ? 'done' : ''}}" wx:for="{{dietStatusList}}" wx:key="label">
+          <text>{{item.label}}</text>
+          <text class="meal-count">{{item.count}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="card head-card">
+      <text class="section-title">饮食记录</text>
+      <button class="head-btn" size="mini" data-key="showDietForm" bindtap="onToggleForm">
+        {{showDietForm ? '收起' : '添加'}}
+      </button>
+    </view>
+
+    <view class="card form-card" wx:if="{{showDietForm}}">
+      <view class="field-inline">
+        <view class="field-inline-item">
+          <text class="field-label">餐次</text>
+          <picker
+            mode="selector"
+            range="{{mealOptions}}"
+            value="{{dietForm.mealIndex}}"
+            data-form="dietForm"
+            data-index-field="mealIndex"
+            data-label-field="mealLabel"
+            data-option-key="mealOptions"
+            bindchange="onPickerIndexChange"
+          >
+            <view class="field-picker">{{dietForm.mealLabel}}</view>
+          </picker>
+        </view>
+
+        <view class="field-inline-item">
+          <text class="field-label">日期</text>
+          <picker
+            mode="date"
+            value="{{dietForm.date}}"
+            data-form="dietForm"
+            data-field="date"
+            bindchange="onDateChange"
+          >
+            <view class="field-picker">{{dietForm.date}}</view>
+          </picker>
+        </view>
+      </view>
+
+      <view class="field-block">
+        <text class="field-label">食物（可填份量）</text>
+        <input
+          class="field-input"
+          placeholder="例如：鸡蛋:1个, 牛奶:250ml"
+          value="{{dietForm.foodsText}}"
+          data-form="dietForm"
+          data-field="foodsText"
+          bindinput="onInputChange"
+        />
+      </view>
+
+      <view class="field-block">
+        <text class="field-label">备注（可选）</text>
+        <textarea
+          class="field-textarea"
+          placeholder="填写饮食补充说明"
+          value="{{dietForm.notes}}"
+          data-form="dietForm"
+          data-field="notes"
+          bindinput="onInputChange"
+          maxlength="120"
+        />
+      </view>
+
+      <button class="btn-primary submit-btn" bindtap="onSubmitDiet">保存饮食记录</button>
+    </view>
+
+    <view class="state-box" wx:if="{{dietLoading}}">正在加载饮食记录...</view>
+    <view class="state-box empty" wx:if="{{!dietLoading && !dietList.length}}">暂无饮食记录，点击上方“添加”。</view>
+
+    <view class="card item-card" wx:for="{{dietList}}" wx:key="id">
+      <view class="item-head">
+        <text class="item-title">{{item.mealType}}</text>
+        <text class="item-sub">{{item.date}}</text>
+      </view>
+      <text class="item-line">食物：{{item.foodsText}}</text>
+      <text class="item-note" wx:if="{{item.notes}}">备注：{{item.notes}}</text>
+      <view class="item-actions">
+        <button class="mini-btn danger" size="mini" data-id="{{item.id}}" bindtap="onDeleteDiet">删除</button>
+      </view>
+    </view>
+
+    <button
+      class="load-more-btn"
+      wx:if="{{dietHasMore && !dietLoading}}"
+      bindtap="onLoadMoreDiet"
+      loading="{{dietLoadingMore}}"
+      disabled="{{dietLoadingMore}}"
+    >
+      加载更多
+    </button>
+  </view>
+
+  <view wx:if="{{isLogin}}" hidden="{{activeTab !== 'calorie'}}">
+    <view class="card calorie-summary-card">
+      <view class="calorie-summary-head">
+        <text class="calorie-summary-title">今日热量</text>
+        <text class="calorie-summary-date">{{calorieDate}}</text>
+      </view>
+      <view class="calorie-summary-value">
+        <text class="calorie-current">{{totalCalories}}</text>
+        <text class="calorie-target"> / {{recommendedIntake}} kcal</text>
+      </view>
+      <view class="calorie-progress-track">
+        <view class="calorie-progress-fill" style="width: {{calorieProgress}}%;"></view>
+      </view>
+      <view class="calorie-summary-actions">
+        <button class="head-btn" size="mini" bindtap="showCalculateModal">计算每日需求</button>
+        <button class="head-btn ghost" size="mini" bindtap="showAddFoodModal">手动添加</button>
+      </view>
+    </view>
+
+    <view class="card head-card">
+      <text class="section-title">今日食物</text>
+    </view>
+
+    <view class="state-box empty" wx:if="{{!todayFoods.length}}">今日还没有记录食物，去下方食物库添加吧。</view>
+
+    <view class="card item-card" wx:for="{{todayFoods}}" wx:key="id">
+      <view class="item-head">
+        <text class="item-title">{{item.name}}</text>
+        <text class="item-sub">{{item.calories}} kcal</text>
+      </view>
+      <text class="item-line">食用量：{{item.portion}} 克</text>
+      <view class="item-actions">
+        <button class="mini-btn danger" size="mini" data-id="{{item.id}}" bindtap="deleteFood">删除</button>
+      </view>
+    </view>
+
+    <view class="card head-card">
+      <text class="section-title">食物库</text>
+    </view>
+
+    <view class="card form-card">
+      <view class="field-block">
+        <input
+          class="field-input"
+          placeholder="搜索食物名称"
+          value="{{searchKeyword}}"
+          bindinput="onSearchInput"
+        />
+      </view>
+
+      <view class="category-row">
+        <view
+          class="category-chip {{currentCategory === item.id ? 'active' : ''}}"
+          wx:for="{{categories}}"
+          wx:key="id"
+          data-index="{{item.id}}"
+          bindtap="onCategoryChange"
+        >
+          {{item.name}}
+        </view>
+      </view>
+
+      <view class="state-box empty" wx:if="{{!filteredFoods.length}}">没有匹配的食物。</view>
+
+      <view class="food-list">
+        <view
+          class="food-item"
+          wx:for="{{filteredFoods}}"
+          wx:key="id"
+          data-food="{{item}}"
+          bindtap="addFoodToToday"
+        >
+          <text class="food-name">{{item.name}}</text>
+          <text class="food-cal">{{item.calories}} kcal/100g</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="modal-mask" wx:if="{{showCalculateModal}}" bindtap="closeModal">
+    <view class="modal-body" catchtap="noop">
+      <view class="modal-head">
+        <text class="modal-title">计算每日热量需求</text>
+      </view>
+
+      <view class="field-block">
+        <text class="field-label">性别</text>
+        <radio-group class="radio-row" bindchange="onGenderChange">
+          <label class="radio-item">
+            <radio value="male" checked="{{calculateForm.gender === 'male'}}" color="#2DC97E" />男
+          </label>
+          <label class="radio-item">
+            <radio value="female" checked="{{calculateForm.gender === 'female'}}" color="#2DC97E" />女
+          </label>
+        </radio-group>
+      </view>
+
+      <view class="field-block">
+        <text class="field-label">年龄</text>
+        <input
+          class="field-input"
+          type="number"
+          placeholder="例如：30"
+          value="{{calculateForm.age}}"
+          bindinput="onAgeInput"
+        />
+      </view>
+
+      <view class="field-inline">
+        <view class="field-inline-item">
+          <text class="field-label">身高（cm）</text>
+          <input
+            class="field-input"
+            type="digit"
+            placeholder="例如：170"
+            value="{{calculateForm.height}}"
+            bindinput="onHeightInput"
+          />
+        </view>
+        <view class="field-inline-item">
+          <text class="field-label">体重（kg）</text>
+          <input
+            class="field-input"
+            type="digit"
+            placeholder="例如：65"
+            value="{{calculateForm.weight}}"
+            bindinput="onWeightInput"
+          />
+        </view>
+      </view>
+
+      <view class="field-block">
+        <text class="field-label">活动量</text>
+        <picker
+          mode="selector"
+          range="{{activityLevels}}"
+          range-key="name"
+          value="{{calculateForm.activityIndex}}"
+          bindchange="onActivityLevelChange"
+        >
+          <view class="field-picker">{{activityLevels[calculateForm.activityIndex].name}}</view>
+        </picker>
+        <text class="field-hint">{{activityLevels[calculateForm.activityIndex].desc}}</text>
+      </view>
+
+      <view class="modal-actions">
+        <button class="mini-btn" size="mini" bindtap="closeModal">取消</button>
+        <button class="mini-btn primary" size="mini" bindtap="calculateCalories">计算并保存</button>
+      </view>
+    </view>
+  </view>
+
+  <view class="modal-mask" wx:if="{{showAddFoodModal}}" bindtap="closeModal">
+    <view class="modal-body" catchtap="noop">
+      <view class="modal-head">
+        <text class="modal-title">手动添加食物</text>
+      </view>
+
+      <view class="field-block">
+        <text class="field-label">食物名称</text>
+        <input
+          class="field-input"
+          placeholder="例如：自制沙拉"
+          value="{{foodForm.name}}"
+          bindinput="onFoodNameInput"
+        />
+      </view>
+
+      <view class="field-inline">
+        <view class="field-inline-item">
+          <text class="field-label">食用量（克）</text>
+          <input
+            class="field-input"
+            type="digit"
+            placeholder="例如：200"
+            value="{{foodForm.portion}}"
+            bindinput="onPortionInput"
+          />
+        </view>
+        <view class="field-inline-item">
+          <text class="field-label">每100g热量</text>
+          <input
+            class="field-input"
+            type="digit"
+            placeholder="kcal"
+            value="{{foodForm.caloriesPer100g}}"
+            bindinput="onCaloriesInput"
+          />
+        </view>
+      </view>
+
+      <view class="calorie-calc-line">
+        <text class="field-label">本次摄入热量</text>
+        <text class="calorie-calc-value">{{calculatedCalories}} kcal</text>
+      </view>
+
+      <view class="modal-actions">
+        <button class="mini-btn" size="mini" bindtap="closeModal">取消</button>
+        <button class="mini-btn primary" size="mini" bindtap="addFood">确定添加</button>
+      </view>
+    </view>
+  </view>
+</view>

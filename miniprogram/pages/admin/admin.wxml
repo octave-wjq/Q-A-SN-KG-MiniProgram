@@ -1,0 +1,57 @@
+<view class="container admin-page">
+  <view class="header-card">
+    <text class="header-title">数据管理后台</text>
+    <text class="header-desc">导入/更新症状网络与知识图谱数据</text>
+  </view>
+
+  <view class="section">
+    <text class="section-title">症状网络</text>
+    <view class="import-item" wx:for="{{snDatasets}}" wx:key="action">
+      <view class="item-info">
+        <text class="item-label">{{item.label}}</text>
+        <text class="item-status {{item.status}}">{{item.statusText}}</text>
+      </view>
+      <button class="import-btn" size="mini" data-index="{{index}}" bindtap="onSnImport" disabled="{{item.loading}}">
+        {{item.loading ? '导入中...' : '导入'}}
+      </button>
+    </view>
+  </view>
+
+  <view class="section">
+    <text class="section-title">知识图谱</text>
+    <view class="import-item">
+      <view class="item-info">
+        <text class="item-label">知识图谱节点</text>
+        <text class="item-status {{kgNodesStatus.status}}">{{kgNodesStatus.statusText}}</text>
+      </view>
+      <button class="import-btn" size="mini" bindtap="onKgNodesImport" disabled="{{kgNodesStatus.loading}}">
+        {{kgNodesStatus.loading ? '导入中...' : '导入'}}
+      </button>
+    </view>
+    <view class="import-item">
+      <view class="item-info">
+        <text class="item-label">知识图谱边</text>
+        <text class="item-status {{kgEdgesStatus.status}}">{{kgEdgesStatus.statusText}}</text>
+      </view>
+      <button class="import-btn" size="mini" bindtap="onKgEdgesImport" disabled="{{kgEdgesStatus.loading}}">
+        {{kgEdgesStatus.loading ? '导入中...' : '导入'}}
+      </button>
+    </view>
+  </view>
+
+  <view class="section">
+    <button class="batch-btn" bindtap="onImportAll" disabled="{{batchLoading}}">
+      {{batchLoading ? '批量导入中...' : '一键全部导入'}}
+    </button>
+    <button class="batch-btn" bindtap="onCheckCount" style="margin-top:16rpx;background:#36CFC9;">
+      核验云数据库总数
+    </button>
+  </view>
+
+  <view class="log-section" wx:if="{{logs.length}}">
+    <text class="section-title">操作日志</text>
+    <view class="log-item" wx:for="{{logs}}" wx:key="index">
+      <text class="log-text {{item.type}}">{{item.time}} {{item.msg}}</text>
+    </view>
+  </view>
+</view>

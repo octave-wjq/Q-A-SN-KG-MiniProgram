@@ -1,0 +1,745 @@
+.health-page {
+  padding-bottom: 48rpx;
+}
+
+.intro-card {
+  background: linear-gradient(135deg, #2DC97E, #3FD9A0);
+  box-shadow: 0 14rpx 32rpx rgba(45, 201, 126, 0.28);
+}
+
+.intro-title {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #FFFFFF;
+}
+
+.intro-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12rpx;
+}
+
+.intro-notify-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 168rpx;
+  height: 56rpx;
+  padding: 0 22rpx;
+  margin: 0;
+  border-radius: 999rpx;
+  border: none;
+  font-size: 24rpx;
+  color: var(--color-primary-dark);
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.intro-notify-btn::after {
+  border: none;
+}
+
+.intro-desc {
+  display: block;
+  margin-top: 10rpx;
+  font-size: 26rpx;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.tab-row {
+  margin-top: 18rpx;
+  display: flex;
+  gap: 12rpx;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.tab-item {
+  flex-shrink: 0;
+  min-width: 144rpx;
+  padding: 14rpx 24rpx;
+  border-radius: 999rpx;
+  text-align: center;
+  font-size: 25rpx;
+  color: #5B6B80;
+  background: #FFFFFF;
+  border: 1rpx solid #E3E8EF;
+}
+
+.tab-item.active {
+  color: var(--color-primary-dark);
+  border-color: #8FE3B8;
+  background: var(--color-primary-soft);
+  font-weight: 600;
+}
+
+.head-card {
+  margin-top: 18rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.head-btn {
+  min-width: 120rpx;
+  height: 60rpx;
+  line-height: 60rpx;
+  border-radius: 999rpx;
+  padding: 0 24rpx;
+  font-size: 24rpx;
+  color: #FFFFFF;
+  border: none;
+  background: var(--color-primary);
+}
+
+.head-btn::after {
+  border: none;
+}
+
+.form-card {
+  margin-top: 16rpx;
+}
+
+.field-block {
+  margin-top: 16rpx;
+}
+
+.field-block:first-child {
+  margin-top: 0;
+}
+
+.field-label {
+  display: block;
+  margin-bottom: 8rpx;
+  font-size: 24rpx;
+  color: #61758F;
+}
+
+.field-input,
+.field-picker {
+  min-height: 72rpx;
+  line-height: 72rpx;
+  padding: 0 20rpx;
+  border-radius: var(--radius-md);
+  border: 1rpx solid #E3E8EF;
+  background: #F7F8FA;
+  color: var(--color-text);
+  font-size: 26rpx;
+}
+
+.field-textarea {
+  width: 100%;
+  min-height: 160rpx;
+  padding: 16rpx 20rpx;
+  border-radius: var(--radius-md);
+  border: 1rpx solid #E3E8EF;
+  background: #F7F8FA;
+  color: var(--color-text);
+  font-size: 26rpx;
+  line-height: 1.5;
+}
+
+.field-inline {
+  margin-top: 16rpx;
+  display: flex;
+  gap: 14rpx;
+}
+
+.field-inline-item {
+  flex: 1;
+}
+
+.field-actions {
+  margin-top: 10rpx;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.clear-btn {
+  height: 52rpx;
+  line-height: 52rpx;
+  border-radius: 999rpx;
+  border: none;
+  padding: 0 18rpx;
+  font-size: 22rpx;
+  color: var(--color-primary-dark);
+  background: var(--color-primary-soft);
+}
+
+.clear-btn::after {
+  border: none;
+}
+
+.submit-btn {
+  margin-top: 20rpx;
+}
+
+.state-box {
+  margin-top: 16rpx;
+  padding: 20rpx;
+  border-radius: var(--radius-md);
+  font-size: 25rpx;
+  color: #526279;
+  background: #F5F6F8;
+}
+
+.state-box.empty {
+  color: var(--color-subtext);
+}
+
+.item-card {
+  margin-top: 16rpx;
+  border: 1rpx solid #EEF1F5;
+  box-shadow: none;
+}
+
+.item-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12rpx;
+}
+
+.item-title {
+  flex: 1;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.item-sub {
+  font-size: 24rpx;
+  color: var(--color-primary-dark);
+}
+
+.item-line {
+  display: block;
+  margin-top: 10rpx;
+  font-size: 24rpx;
+  color: #52657F;
+}
+
+.item-note {
+  display: block;
+  margin-top: 10rpx;
+  font-size: 24rpx;
+  color: #6D7E95;
+  line-height: 1.5;
+}
+
+.item-actions {
+  margin-top: 16rpx;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12rpx;
+}
+
+.mini-btn {
+  min-width: 112rpx;
+  height: 56rpx;
+  line-height: 56rpx;
+  padding: 0 20rpx;
+  border-radius: 999rpx;
+  border: none;
+  font-size: 22rpx;
+}
+
+.mini-btn::after {
+  border: none;
+}
+
+.mini-btn.primary {
+  color: #FFFFFF;
+  background: var(--color-primary);
+}
+
+.mini-btn.danger {
+  color: #B42318;
+  background: #FFF1F0;
+}
+
+.stats-card {
+  margin-top: 18rpx;
+  background: linear-gradient(135deg, #E8F9F0, #FFFFFF);
+}
+
+.stats-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12rpx;
+}
+
+.stats-row.compact {
+  margin-top: 12rpx;
+}
+
+.stats-item {
+  flex: 1;
+}
+
+.stats-label {
+  display: block;
+  font-size: 24rpx;
+  color: var(--color-subtext);
+}
+
+.stats-value {
+  display: block;
+  margin-top: 8rpx;
+  font-size: 34rpx;
+  font-weight: 700;
+  color: var(--color-primary-dark);
+}
+
+.stats-sub {
+  font-size: 23rpx;
+  color: #5F7594;
+}
+
+.stats-date {
+  flex: 0;
+  align-self: center;
+  text-align: right;
+  font-size: 24rpx;
+  color: #5D738E;
+}
+
+.intensity-tag {
+  padding: 6rpx 16rpx;
+  border-radius: 999rpx;
+  font-size: 22rpx;
+}
+
+.intensity-low {
+  color: var(--color-primary-dark);
+  background: var(--color-primary-soft);
+}
+
+.intensity-mid {
+  color: #9A6700;
+  background: #FFF7E6;
+}
+
+.intensity-high {
+  color: #C53030;
+  background: #FFF1F0;
+}
+
+.meal-status-row {
+  margin-top: 14rpx;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+}
+
+.meal-chip {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 8rpx 16rpx;
+  border-radius: 999rpx;
+  border: 1rpx solid #E3E8EF;
+  background: #F7F8FA;
+  color: #667B95;
+  font-size: 22rpx;
+}
+
+.meal-chip.done {
+  color: var(--color-primary-dark);
+  border-color: #8FE3B8;
+  background: var(--color-primary-soft);
+}
+
+.meal-count {
+  min-width: 28rpx;
+  text-align: center;
+  color: #4F6788;
+}
+
+.load-more-btn {
+  margin-top: 16rpx;
+  width: 100%;
+  height: 72rpx;
+  line-height: 72rpx;
+  border-radius: 999rpx;
+  border: none;
+  font-size: 25rpx;
+  color: var(--color-primary-dark);
+  background: var(--color-primary-soft);
+}
+
+.load-more-btn::after {
+  border: none;
+}
+
+.calorie-summary-card {
+  margin-top: 18rpx;
+  background: linear-gradient(135deg, #E8F9F0, #FFFFFF);
+}
+
+.calorie-summary-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.calorie-summary-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.calorie-summary-date {
+  font-size: 24rpx;
+  color: #5D738E;
+}
+
+.calorie-summary-value {
+  margin-top: 18rpx;
+  display: flex;
+  align-items: baseline;
+}
+
+.calorie-current {
+  font-size: 56rpx;
+  font-weight: 700;
+  color: var(--color-primary-dark);
+  line-height: 1;
+}
+
+.calorie-target {
+  font-size: 26rpx;
+  color: var(--color-subtext);
+}
+
+.calorie-progress-track {
+  margin-top: 18rpx;
+  height: 18rpx;
+  border-radius: 999rpx;
+  background: #E4EDF8;
+  overflow: hidden;
+}
+
+.calorie-progress-fill {
+  height: 100%;
+  border-radius: 999rpx;
+  background: linear-gradient(135deg, #2DC97E, #3FD9A0);
+  transition: width 0.3s ease;
+}
+
+.calorie-summary-actions {
+  margin-top: 20rpx;
+  display: flex;
+  gap: 12rpx;
+}
+
+.head-btn.ghost {
+  color: var(--color-primary-dark);
+  background: var(--color-primary-soft);
+}
+
+.category-row {
+  margin-top: 16rpx;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+}
+
+.category-chip {
+  padding: 10rpx 22rpx;
+  border-radius: 999rpx;
+  border: 1rpx solid #E3E8EF;
+  background: #F7F8FA;
+  color: #667B95;
+  font-size: 24rpx;
+}
+
+.category-chip.active {
+  color: var(--color-primary-dark);
+  border-color: #8FE3B8;
+  background: var(--color-primary-soft);
+  font-weight: 600;
+}
+
+.food-list {
+  margin-top: 16rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.food-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18rpx 20rpx;
+  border-radius: var(--radius-md);
+  border: 1rpx solid #EEF1F5;
+  background: #F7F8FA;
+}
+
+.food-name {
+  font-size: 26rpx;
+  color: var(--color-text);
+}
+
+.food-cal {
+  font-size: 23rpx;
+  color: #5F7594;
+}
+
+.modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40rpx;
+  background: rgba(15, 28, 46, 0.45);
+}
+
+.modal-body {
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 32rpx;
+  border-radius: var(--radius-lg);
+  background: #FFFFFF;
+}
+
+.modal-head {
+  margin-bottom: 12rpx;
+}
+
+.modal-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.radio-row {
+  display: flex;
+  gap: 40rpx;
+}
+
+.radio-item {
+  font-size: 26rpx;
+  color: var(--color-text);
+}
+
+.field-hint {
+  display: block;
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  color: #8595A8;
+  line-height: 1.4;
+}
+
+.calorie-calc-line {
+  margin-top: 18rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.calorie-calc-value {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: var(--color-primary-dark);
+}
+
+.modal-actions {
+  margin-top: 28rpx;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12rpx;
+}
+
+.mini-btn:not(.primary):not(.danger) {
+  color: #52657F;
+  background: #EEF2F7;
+}
+
+/* 用药提醒时间选择 */
+.time-add-btn {
+  min-height: 72rpx;
+  line-height: 72rpx;
+  padding: 0 20rpx;
+  border-radius: var(--radius-md);
+  border: 1rpx dashed #8FE3B8;
+  background: #E8F9F0;
+  color: #2DC97E;
+  font-size: 26rpx;
+  text-align: center;
+}
+
+.time-chip-row {
+  margin-top: 14rpx;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.time-chip {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 10rpx 16rpx 10rpx 20rpx;
+  border-radius: 999rpx;
+  border: 1rpx solid #8FE3B8;
+  background: #E8F9F0;
+}
+
+.time-chip-text {
+  font-size: 25rpx;
+  color: #1E9E63;
+}
+
+.time-chip-remove {
+  width: 36rpx;
+  height: 36rpx;
+  line-height: 34rpx;
+  text-align: center;
+  border-radius: 50%;
+  background: #2DC97E;
+  color: #FFFFFF;
+  font-size: 26rpx;
+}
+
+/* 今日提醒卡片 */
+.reminder-card {
+  margin-top: 18rpx;
+  background: #E8F9F0;
+  border: 1rpx solid #8FE3B8;
+}
+
+.reminder-title {
+  display: block;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1E9E63;
+}
+
+.reminder-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.reminder-more {
+  font-size: 24rpx;
+  color: #1E9E63;
+}
+
+.done-tag {
+  align-self: center;
+  padding: 0 18rpx;
+  font-size: 22rpx;
+  color: var(--color-subtext);
+}
+
+.reminder-item {
+  margin-top: 16rpx;
+  display: flex;
+  align-items: flex-start;
+  gap: 14rpx;
+}
+
+.reminder-dot {
+  margin-top: 10rpx;
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+  background: #2DC97E;
+  flex-shrink: 0;
+}
+
+.reminder-dot.appt {
+  background: #2F86EB;
+}
+
+.reminder-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.reminder-name {
+  font-size: 27rpx;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.reminder-desc {
+  margin-top: 4rpx;
+  font-size: 24rpx;
+  color: #4F6788;
+}
+
+/* 用药提醒逐条打卡 chip */
+.reminder-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-top: 12rpx;
+}
+
+.reminder-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10rpx 20rpx;
+  border-radius: 14rpx;
+  background: #E8F9F0;
+  border: 1rpx solid #B6EAD0;
+  min-width: 120rpx;
+}
+
+.reminder-chip.taken {
+  background: #F2F4F7;
+  border-color: #E2E6EB;
+}
+
+.reminder-chip-time {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #21A866;
+}
+
+.reminder-chip.taken .reminder-chip-time {
+  color: #9AA3AF;
+}
+
+.reminder-chip-status {
+  font-size: 20rpx;
+  color: #21A866;
+  margin-top: 4rpx;
+}
+
+.reminder-chip.taken .reminder-chip-status {
+  color: #9AA3AF;
+}
+
+/* 未登录引导 */
+.login-guard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 60rpx 32rpx;
+}
+.login-guard-icon { font-size: 72rpx; margin-bottom: 16rpx; }
+.login-guard-title { font-size: 32rpx; font-weight: 600; color: #1F2D3D; }
+.login-guard-desc { font-size: 26rpx; color: #8A93A0; line-height: 1.6; margin: 16rpx 0 28rpx; }
+.login-guard-btn {
+  min-width: 240rpx; height: 80rpx; min-height: 80rpx; padding: 0 40rpx;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 999rpx; background: linear-gradient(135deg, #2DC97E, #3FD9A0);
+  color: #FFFFFF; font-size: 30rpx; border: none;
+}
+.login-guard-btn::after { border: none; }

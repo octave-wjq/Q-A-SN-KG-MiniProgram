@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>知识-症状网络图谱</title>
+  <script src="/vis-network.min.js"></script>
+  <style>
+    :root {
+      --bg: #f3f6fb; --card: rgba(255,255,255,0.95); --line: #d7deea;
+      --text: #0f172a; --muted: #5b6475; --accent: #2DC97E;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0; padding: 0; width: 100%; height: 100%;
+      background: radial-gradient(circle at 20% 20%, #fff 0%, var(--bg) 50%, #e4ebf7 100%);
+      font-family: "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      color: var(--text);
+    }
+    .app { position: relative; width: 100%; height: 100dvh; overflow: hidden; display: flex; flex-direction: column; }
+    .top-bar {
+      flex: 0 0 auto; z-index: 20; display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+      padding: 10px; background: rgba(255,255,255,0.92); backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--line);
+    }
+    .title { width: 100%; margin: 0 0 2px; font-size: 18px; font-weight: 700; }
+    .search-row { display: flex; gap: 8px; width: 100%; }
+    .search-row input {
+      flex: 1; min-width: 0; padding: 9px 10px; border: 1px solid var(--line);
+      border-radius: 10px; font-size: 14px; outline: none; background: #fff;
+    }
+    .search-row input:focus { border-color: #8fe0b8; box-shadow: 0 0 0 3px rgba(45,201,126,0.15); }
+    button {
+      border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--text);
+      font-size: 13px; padding: 9px 12px; cursor: pointer;
+    }
+    button.primary { border-color: var(--accent); background: var(--accent); color: #fff; }
+    .network-wrap { flex: 1 1 auto; position: relative; min-height: 0; }
+    .beian-footer {
+      flex: 0 0 auto; text-align: center; padding: 8px 10px;
+      font-size: 12px; color: #8a93a0; background: rgba(255,255,255,0.92);
+      border-top: 1px solid var(--line);
+    }
+    .beian-footer a { color: #8a93a0; text-decoration: none; }
+    #network { position: absolute; top: 0; left: 0; right: 0; bottom: 0; }
+    .loading {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+      font-size: 14px; color: var(--muted); z-index: 5;
+    }
+    .message {
+      position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+      background: rgba(15,23,42,0.85); color: #fff; padding: 8px 16px; border-radius: 20px;
+      font-size: 13px; z-index: 30; opacity: 0; transition: opacity 0.3s; pointer-events: none;
+    }
+    .message.show { opacity: 1; }
+    .legend {
+      position: absolute; top: 12px; right: 12px; z-index: 18; background: var(--card);
+      border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; max-width: 180px;
+      max-height: 60vh; overflow-y: auto; box-shadow: 0 6px 20px rgba(15,23,42,0.08);
+    }
+    .legend-title { font-size: 12px; font-weight: 700; margin: 8px 0 4px; color: var(--muted); }
+    .legend-title:first-child { margin-top: 0; }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; padding: 3px 4px; border-radius: 6px; cursor: pointer; }
+    .legend-item:active { background: #eef2f7; }
+    .legend-item.off { opacity: 0.35; text-decoration: line-through; }
+    .legend-hint { font-size: 11px; color: #94a3b8; margin-bottom: 6px; }
+    .legend-actions { display: flex; gap: 6px; margin-top: 8px; }
+    .legend-actions button { flex: 1; font-size: 11px; padding: 4px 0; }
+    .legend-dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+    .legend-toggle { position: absolute; top: 12px; right: 12px; z-index: 19; display: none; }
+    .legend.collapsed { display: none; }
+    .legend.collapsed + .legend-toggle { display: block; }
+    .detail-panel {
+      position: absolute; bottom: 12px; left: 12px; right: 12px; z-index: 18; background: var(--card);
+      border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px;
+      box-shadow: 0 6px 20px rgba(15,23,42,0.1); display: none; max-height: 40vh; overflow-y: auto;
+    }
+    .detail-panel.visible { display: block; }
+    .detail-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .detail-name { font-size: 15px; font-weight: 700; }
+    .detail-row { font-size: 13px; color: var(--text); margin: 3px 0; }
+    .detail-row strong { color: var(--muted); font-weight: 600; }
+    .src-tag { display: inline-block; font-size: 11px; padding: 1px 8px; border-radius: 10px; color: #fff; margin-left: 6px; }
+    .src-kg { background: #2563eb; }
+    .src-sn { background: #0f766e; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="top-bar">
+      <h1 class="title">知识-症状网络图谱</h1>
+      <div class="search-row">
+        <input id="searchInput" type="text" placeholder="输入节点名称（如：发热、拉米夫定）" />
+        <button id="searchBtn" class="primary">搜索</button>
+        <button id="loadAllBtn">加载全部</button>
+        <button id="resetBtn">重置</button>
+      </div>
+    </div>
+    <div class="network-wrap">
+      <div id="network"></div>
+      <div id="loading" class="loading">正在加载图谱数据...</div>
+      <div id="message" class="message"></div>
+      <div id="legend" class="legend"></div>
+      <button id="legendToggleBtn" class="legend-toggle">图例</button>
+      <div id="detailPanel" class="detail-panel">
+        <div class="detail-head">
+          <span class="detail-name" id="detailName"></span>
+          <button id="closeDetailBtn">关闭</button>
+        </div>
+        <div id="detailBody"></div>
+      </div>
+    </div>
+    <div class="beian-footer">
+      <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener">沪ICP备2026026801号-1</a>
+    </div>
+  </div>
+  <script>
+    var KG_COLORS = {
+      "疾病": "#b42318", "症状": "#1d4ed8", "药物": "#15803d", "人群": "#6d28d9",
+      "传播途径": "#c2410c", "并发症": "#854d0e", "疾病阶段": "#0f766e", "检查": "#0369a1",
+      "干预方法": "#334155", "不良反应": "#9f1239", "证候诊断": "#5b21b6", "其他": "#4b5563"
+    };
+    var SN_COLORS = {
+      "全身症状": "#0072B2", "神经症状": "#F0E442", "消化症状": "#009E73",
+      "认知症状": "#E69F00", "皮肤关节症状": "#CC79A7", "心理症状": "#56B4E9"
+    };
+
+    var searchInput = document.getElementById("searchInput");
+    var searchBtn = document.getElementById("searchBtn");
+    var resetBtn = document.getElementById("resetBtn");
+    var loadAllBtn = document.getElementById("loadAllBtn");
+    var legend = document.getElementById("legend");
+    var legendToggleBtn = document.getElementById("legendToggleBtn");
+    var detailPanel = document.getElementById("detailPanel");
+    var detailName = document.getElementById("detailName");
+    var detailBody = document.getElementById("detailBody");
+    var closeDetailBtn = document.getElementById("closeDetailBtn");
+    var networkContainer = document.getElementById("network");
+    var loading = document.getElementById("loading");
+    var messageEl = document.getElementById("message");
+
+    var network = null, nodeDataSet = null, edgeDataSet = null;
+    var nodeMap = new Map();
+    var messageTimer = null;
+
+    function showMessage(text) {
+      messageEl.textContent = text;
+      messageEl.classList.add("show");
+      if (messageTimer) clearTimeout(messageTimer);
+      messageTimer = setTimeout(function () { messageEl.classList.remove("show"); }, 2200);
+    }
+
+    function kgNodeColor(type) { return KG_COLORS[type] || KG_COLORS["其他"]; }
+    function snNodeColor(group) { return SN_COLORS[group] || "#56B4E9"; }
+
+    // 合并两份数据为统一的 nodes/edges。节点加来源前缀，两图不连通。
+    function buildMerged(kg, sn) {
+      var nodes = [], edges = [];
+      (kg.nodes || []).forEach(function (n) {
+        var color = kgNodeColor(n.primary_type);
+        nodes.push({
+          id: "kg::" + n.id, label: n.label || n.id, source: "kg",
+          rawId: n.id, primary_type: n.primary_type || "其他",
+          in_degree: n.in_degree || 0, out_degree: n.out_degree || 0,
+          shape: "dot", size: 10 + Math.min(20, (n.in_degree || 0) + (n.out_degree || 0)),
+          color: { background: color, border: color, highlight: { background: color, border: "#111" } },
+          font: { color: "#1f2937", size: 12 }
+        });
+      });
+      (kg.edges || []).forEach(function (e, i) {
+        edges.push({
+          id: "kge" + i, from: "kg::" + e.source, to: "kg::" + e.target,
+          label: e.relation_label || "", arrows: "to",
+          color: { color: "rgba(120,130,150,0.5)", highlight: "#2563eb" },
+          font: { size: 10, color: "#6b7280", strokeWidth: 3, strokeColor: "#fff" },
+          smooth: { enabled: true, type: "continuous" }, _src: "kg"
+        });
+      });
+      (sn.nodes || []).forEach(function (n) {
+        var color = snNodeColor(n.primary_type);
+        nodes.push({
+          id: "sn::" + n.id, label: n.label || n.id, source: "sn",
+          rawId: n.id, primary_type: n.primary_type || "",
+          strength: n.centrality_strength || 0, frequency: n.frequency || 0,
+          shape: "dot", size: 14 + Math.min(24, (n.frequency || 0) / 60),
+          color: { background: color, border: color, highlight: { background: color, border: "#111" } },
+          font: { color: "#1f2937", size: 13 }
+        });
+      });
+      (sn.edges || []).forEach(function (e, i) {
+        var neg = !!e.is_negative;
+        edges.push({
+          id: "sne" + i, from: "sn::" + e.source, to: "sn::" + e.target,
+          width: 1 + Math.abs(e.weight || 0) * 4,
+          color: { color: neg ? "rgba(185,28,28,0.5)" : "rgba(29,78,216,0.45)", highlight: neg ? "#b91c1c" : "#1d4ed8" },
+          dashes: neg, smooth: { enabled: true, type: "continuous" },
+          _weight: e.weight, _src: "sn"
+        });
+      });
+      return { nodes: nodes, edges: edges };
+    }
+    var hiddenTypes = {};   // 被取消勾选、需隐藏的类型集合 { 类型名: true }
+
+    function renderLegend() {
+      // 只显示数据中实际存在的类型，避免出现空的「其他」等无节点 label
+      var presentKg = {}, presentSn = {};
+      (ALL.nodes || []).forEach(function (n) {
+        if (n.source === 'kg') presentKg[n.primary_type] = true;
+        else if (n.source === 'sn') presentSn[n.primary_type] = true;
+      });
+      var html = '<div class="legend-hint">点击类型可筛选显示</div>';
+      html += '<div class="legend-title">知识图谱</div>';
+      Object.keys(KG_COLORS).forEach(function (t) {
+        if (!presentKg[t]) return;
+        var off = hiddenTypes[t] ? ' off' : '';
+        html += '<div class="legend-item' + off + '" data-type="' + t + '"><span class="legend-dot" style="background:' + KG_COLORS[t] + '"></span>' + t + '</div>';
+      });
+      html += '<div class="legend-title">症状网络</div>';
+      Object.keys(SN_COLORS).forEach(function (t) {
+        if (!presentSn[t]) return;
+        var off2 = hiddenTypes[t] ? ' off' : '';
+        html += '<div class="legend-item' + off2 + '" data-type="' + t + '"><span class="legend-dot" style="background:' + SN_COLORS[t] + '"></span>' + t + '</div>';
+      });
+      html += '<div class="legend-actions"><button id="legendAllBtn" type="button">全选</button><button id="legendNoneBtn" type="button">全不选</button></div>';
+      legend.innerHTML = html;
+    }
+
+    // 当前是否显示某节点（类型未被隐藏）
+    function typeVisible(node) {
+      return !hiddenTypes[node.primary_type];
+    }
+
+    // 重新渲染当前视图（核心/全部），并应用类型过滤
+    function rerenderWithFilter() {
+      var base = showingAll ? ALL.nodes : pickCoreNodes(CORE_LIMIT);
+      var nodes = base.filter(typeVisible);
+      buildNetwork(subgraph(nodes, true), true);
+      updateLoadAllBtn();
+    }
+
+    function resetStyles() {
+      if (!nodeDataSet || !edgeDataSet) return;
+      var nu = nodeDataSet.getIds().map(function (id) {
+        return { id: id, opacity: 1, font: { color: "#1f2937" } };
+      });
+      nodeDataSet.update(nu);
+      var eu = edgeDataSet.getIds().map(function (id) {
+        var e = edgeDataSet.get(id);
+        var neg = e._src === "sn" && e._weight < 0;
+        var base = e._src === "kg" ? "rgba(120,130,150,0.5)" : (neg ? "rgba(185,28,28,0.5)" : "rgba(29,78,216,0.45)");
+        return { id: id, color: { color: base, highlight: e._src === "kg" ? "#2563eb" : (neg ? "#b91c1c" : "#1d4ed8") } };
+      });
+      edgeDataSet.update(eu);
+    }
+
+    function highlightForNode(nodeId) {
+      if (!network || !nodeDataSet || !edgeDataSet) return;
+      var connectedNodes = new Set(network.getConnectedNodes(nodeId));
+      connectedNodes.add(nodeId);
+      var connectedEdges = new Set(network.getConnectedEdges(nodeId));
+      var nu = nodeDataSet.getIds().map(function (id) {
+        if (connectedNodes.has(id)) return { id: id, opacity: 1, font: { color: "#1f2937" } };
+        return { id: id, opacity: 0.15, font: { color: "rgba(120,120,120,0.25)" } };
+      });
+      nodeDataSet.update(nu);
+      var eu = edgeDataSet.getIds().map(function (id) {
+        if (connectedEdges.has(id)) {
+          return { id: id, color: { color: "#2DC97E", highlight: "#2DC97E" } };
+        }
+        return { id: id, color: { color: "rgba(170,180,195,0.12)", highlight: "rgba(170,180,195,0.12)" } };
+      });
+      edgeDataSet.update(eu);
+    }
+
+    function showDetail(nodeId) {
+      var n = nodeMap.get(nodeId);
+      if (!n) return;
+      var srcTag = n.source === "kg"
+        ? '<span class="src-tag src-kg">知识图谱</span>'
+        : '<span class="src-tag src-sn">症状网络</span>';
+      var html = '';
+      if (n.source === "kg") {
+        html += '<div class="detail-row"><strong>类型：</strong>' + (n.primary_type || "其他") + '</div>';
+        html += '<div class="detail-row"><strong>入度：</strong>' + n.in_degree + '　<strong>出度：</strong>' + n.out_degree + '</div>';
+      } else {
+        html += '<div class="detail-row"><strong>症状分组：</strong>' + (n.primary_type || "-") + '</div>';
+        html += '<div class="detail-row"><strong>中心性：</strong>' + Number(n.strength || 0).toFixed(3) + '　<strong>频次：</strong>' + n.frequency + '</div>';
+      }
+      var conn = network ? network.getConnectedNodes(nodeId).length : 0;
+      html += '<div class="detail-row"><strong>关联节点：</strong>' + conn + '</div>';
+      detailName.innerHTML = n.label + srcTag;
+      detailBody.innerHTML = html;
+      detailPanel.classList.add("visible");
+    }
+    function hideDetail() { detailPanel.classList.remove("visible"); }
+
+    function focusNode(nodeId) {
+      network.selectNodes([nodeId]);
+      network.focus(nodeId, { scale: 1.1, animation: false });
+      showDetail(nodeId);
+      highlightForNode(nodeId);
+    }
+
+    // 搜索：type 限定 kg/sn，缺省两者都找；匹配 label。
+    // 命中后以该节点为中心显示邻居子图（轻量且聚焦）。
+    function doSearch(keyword, type) {
+      var kw = String(keyword || "").trim().toLowerCase();
+      if (!kw) { showMessage("请输入要搜索的名称"); return; }
+      var pool = ALL.nodes.filter(function (n) { return !type || n.source === type; });
+      var target = pool.find(function (n) { return String(n.label).toLowerCase() === kw; })
+        || pool.find(function (n) { return String(n.label).toLowerCase().indexOf(kw) !== -1; });
+      if (!target) { showMessage("未找到匹配节点"); return; }
+      renderNeighbor(target.id);
+    }
+
+    var ALL = { nodes: [], edges: [] };   // 全量数据（搜索用）
+    var CORE_LIMIT = 100;                  // KG 初始核心节点数
+    var showingAll = false;
+
+    // 计算 KG 节点度数（in+out），取前 N 个核心节点；SN 节点全部保留
+    function pickCoreNodes(limit) {
+      var kg = ALL.nodes.filter(function (n) { return n.source === "kg"; });
+      var sn = ALL.nodes.filter(function (n) { return n.source === "sn"; });
+      kg.sort(function (a, b) {
+        return ((b.in_degree || 0) + (b.out_degree || 0)) - ((a.in_degree || 0) + (a.out_degree || 0));
+      });
+      return kg.slice(0, limit).concat(sn);
+    }
+
+    // 给定要显示的节点集合，过滤出两端都在集合内的边
+    function subgraph(nodes, dropIsolated) {
+      var idSet = new Set(nodes.map(function (n) { return n.id; }));
+      var edges = ALL.edges.filter(function (e) { return idSet.has(e.from) && idSet.has(e.to); });
+      if (dropIsolated) {
+        // 剔除在当前子图里没有任何连接边的孤立节点
+        var linked = new Set();
+        edges.forEach(function (e) { linked.add(e.from); linked.add(e.to); });
+        nodes = nodes.filter(function (n) { return linked.has(n.id); });
+      }
+      return { nodes: nodes, edges: edges };
+    }
+
+    // 以某节点为中心的子图：该节点 + 直接邻居（用于 qa 跳转聚焦场景）
+    function neighborSubgraph(centerId) {
+      var idSet = new Set([centerId]);
+      ALL.edges.forEach(function (e) {
+        if (e.from === centerId) idSet.add(e.to);
+        if (e.to === centerId) idSet.add(e.from);
+      });
+      var nodes = ALL.nodes.filter(function (n) { return idSet.has(n.id); });
+      return subgraph(nodes);
+    }
+
+    function buildNetwork(sub, fast) {
+      nodeDataSet = new vis.DataSet(sub.nodes);
+      edgeDataSet = new vis.DataSet(sub.edges);
+      network = new vis.Network(networkContainer, { nodes: nodeDataSet, edges: edgeDataSet }, {
+        interaction: { hover: true, dragView: true, zoomView: true, tooltipDelay: 120 },
+        physics: {
+          enabled: true, solver: "barnesHut",
+          barnesHut: { gravitationalConstant: -3200, springConstant: 0.04, springLength: 120, damping: 0.12, avoidOverlap: 0.1 },
+          stabilization: { enabled: true, iterations: fast ? 80 : 150, updateInterval: 25, fit: true }
+        },
+        layout: { improvedLayout: false }
+      });
+      network.once("stabilizationIterationsDone", function () {
+        network.setOptions({ physics: { enabled: false } });
+        network.fit({ animation: false });
+      });
+      network.on("click", function (params) {
+        if (params.nodes && params.nodes.length) {
+          var id = params.nodes[0];
+          showDetail(id); highlightForNode(id);
+        } else { hideDetail(); resetStyles(); }
+      });
+    }
+
+    // 初始渲染：只显示核心节点子图（轻量、加载快）
+    function renderCore() {
+      showingAll = false;
+      buildNetwork(subgraph(pickCoreNodes(CORE_LIMIT), true), true);
+      updateLoadAllBtn();
+    }
+
+    // 显示全部节点
+    function renderAll() {
+      showingAll = true;
+      showMessage("正在加载全部节点...");
+      setTimeout(function () {
+        buildNetwork(subgraph(ALL.nodes), false);
+        updateLoadAllBtn();
+      }, 50);
+    }
+
+    // 以节点为中心显示邻居子图（qa 跳转聚焦）
+    function renderNeighbor(centerId) {
+      showingAll = false;
+      buildNetwork(neighborSubgraph(centerId), true);
+      updateLoadAllBtn();
+      network.once("stabilizationIterationsDone", function () {
+        network.setOptions({ physics: { enabled: false } });
+        focusNode(centerId);
+      });
+    }
+
+    function updateLoadAllBtn() {
+      if (!loadAllBtn) return;
+      var total = ALL.nodes.length;
+      var shown = nodeDataSet ? nodeDataSet.length : 0;
+      if (showingAll || shown >= total) {
+        loadAllBtn.textContent = "核心视图";
+        loadAllBtn.dataset.mode = "core";
+      } else {
+        loadAllBtn.textContent = "加载全部(" + total + ")";
+        loadAllBtn.dataset.mode = "all";
+      }
+    }
+
+    function bindEvents() {
+      searchBtn.addEventListener("click", function () { doSearch(searchInput.value, ""); });
+      searchInput.addEventListener("keydown", function (e) { if (e.key === "Enter") doSearch(searchInput.value, ""); });
+      loadAllBtn.addEventListener("click", function () {
+        if (loadAllBtn.dataset.mode === "all") { renderAll(); }
+        else { renderCore(); }
+      });
+      resetBtn.addEventListener("click", function () {
+        searchInput.value = "";
+        hideDetail();
+        renderCore();
+      });
+      legendToggleBtn.addEventListener("click", function () {
+        legend.classList.toggle("collapsed");
+      });
+      // 图例点击：切换类型显隐 / 全选 / 全不选
+      legend.addEventListener("click", function (e) {
+        var allBtn = e.target.closest && e.target.closest("#legendAllBtn");
+        var noneBtn = e.target.closest && e.target.closest("#legendNoneBtn");
+        if (allBtn) { hiddenTypes = {}; renderLegend(); rerenderWithFilter(); return; }
+        if (noneBtn) {
+          hiddenTypes = {};
+          Object.keys(KG_COLORS).forEach(function (t) { hiddenTypes[t] = true; });
+          Object.keys(SN_COLORS).forEach(function (t) { hiddenTypes[t] = true; });
+          renderLegend(); rerenderWithFilter(); return;
+        }
+        var item = e.target.closest && e.target.closest(".legend-item");
+        if (item && item.dataset.type) {
+          var t = item.dataset.type;
+          if (hiddenTypes[t]) { delete hiddenTypes[t]; } else { hiddenTypes[t] = true; }
+          renderLegend();
+          rerenderWithFilter();
+        }
+      });
+      closeDetailBtn.addEventListener("click", function () { hideDetail(); network && network.unselectAll(); resetStyles(); });
+    }
+
+    Promise.all([
+      fetch("/data/kg_graph_vis.json").then(function (r) { if (!r.ok) throw new Error("kg HTTP " + r.status); return r.json(); }),
+      fetch("/data/sn_graph_vis.json").then(function (r) { if (!r.ok) throw new Error("sn HTTP " + r.status); return r.json(); })
+    ]).then(function (arr) {
+      var merged = buildMerged(arr[0], arr[1]);
+      ALL = merged;
+      merged.nodes.forEach(function (n) { nodeMap.set(n.id, n); });
+      renderLegend();
+      bindEvents();
+
+      // URL 参数 ?focus=节点名&type=kg|sn：只显示该节点+邻居子图（qa 跳转场景）
+      var focusName = null, focusType = "";
+      try {
+        var params = new URLSearchParams(window.location.search);
+        focusName = params.get("focus");
+        focusType = (params.get("type") || "").toLowerCase();
+      } catch (e) {}
+
+      if (focusName) {
+        var pool = ALL.nodes.filter(function (n) { return !focusType || n.source === focusType; });
+        var target = pool.find(function (n) { return String(n.label).toLowerCase() === String(focusName).toLowerCase(); })
+          || pool.find(function (n) { return String(n.label).toLowerCase().indexOf(String(focusName).toLowerCase()) !== -1; });
+        searchInput.value = focusName;
+        if (target) { renderNeighbor(target.id); }
+        else { renderCore(); showMessage("未找到节点：" + focusName); }
+      } else {
+        // 默认只渲染核心节点，加载快
+        renderCore();
+      }
+      loading.style.display = "none";
+    }).catch(function (err) {
+      loading.textContent = "数据加载失败：" + err.message;
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>艾滋病健康管理 — 图谱可视化</title>
+  <style>
+    :root {
+      --bg: #eef3fb;
+      --card: rgba(255, 255, 255, 0.95);
+      --line: #d6dfef;
+      --text: #0f172a;
+      --muted: #475569;
+      --kg: #1d4ed8;
+      --sn: #0f766e;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      font-family: "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      background: radial-gradient(circle at 15% 15%, #ffffff 0%, var(--bg) 48%, #e3ebf8 100%);
+      color: var(--text);
+    }
+
+    .page {
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .panel {
+      width: min(720px, 100%);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--card);
+      box-shadow: 0 22px 44px rgba(15, 23, 42, 0.12);
+      padding: 24px 18px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 26px;
+      line-height: 1.25;
+      letter-spacing: 0.2px;
+    }
+
+    .subtitle {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .nav {
+      margin-top: 20px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    .nav-link {
+      display: block;
+      text-decoration: none;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: #ffffff;
+      padding: 18px 16px;
+      transition: 0.2s ease;
+    }
+
+    .nav-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 28px rgba(15, 23, 42, 0.12);
+    }
+
+    .nav-link.kg {
+      border-color: rgba(29, 78, 216, 0.26);
+    }
+
+    .nav-link.sn {
+      border-color: rgba(15, 118, 110, 0.26);
+    }
+
+    .link-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .kg .link-title {
+      color: var(--kg);
+    }
+
+    .sn .link-title {
+      color: var(--sn);
+    }
+
+    .link-desc {
+      margin-top: 6px;
+      color: #475569;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    @media (min-width: 820px) {
+      .panel {
+        padding: 28px 24px;
+      }
+
+      .nav {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="panel">
+      <h1>艾滋病健康管理 — 图谱可视化</h1>
+      <div class="subtitle">移动端和桌面端均可访问，点击进入对应网络图</div>
+      <div class="nav">
+        <a class="nav-link kg" href="./kg.html">
+          <p class="link-title">艾滋病健康教育知识图谱</p>
+          <div class="link-desc">2806 节点 / 3717 边，支持搜索、关系过滤、核心节点视图与详情面板。</div>
+        </a>
+        <a class="nav-link sn" href="./sn.html">
+          <p class="link-title">HIV/AIDS 症状网络图</p>
+          <div class="link-desc">27 节点 / 130 边，支持中心性映射、权重标签、分组图例与详情查看。</div>
+        </a>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

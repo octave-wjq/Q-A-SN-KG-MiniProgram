@@ -1,0 +1,9 @@
+{
+  "name": "coze",
+  "version": "1.0.0",
+  "description": "Coze 问答云函数（原生 HTTP）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

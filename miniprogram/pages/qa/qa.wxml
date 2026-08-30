@@ -1,0 +1,185 @@
+<view class="qa-page">
+  <!-- 顶部操作栏 -->
+  <view class="top-bar">
+    <text class="top-title">健康问答</text>
+    <view class="top-actions">
+      <view class="history-btn" bindtap="onShowHistory">
+        <text class="history-btn-text">历史</text>
+      </view>
+      <view class="new-chat-btn" bindtap="onNewChat">
+        <text class="new-chat-icon">+</text>
+        <text class="new-chat-text">新对话</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- AI 生成内容说明 -->
+  <view class="ai-notice">
+    <text class="ai-notice-text">⚠️ 本页回答由 AI 人工智能生成，仅供参考，不能替代专业医生诊断</text>
+  </view>
+
+  <view class="symptom-quick-card" wx:if="{{symptomPromptCard}}">
+    <view class="symptom-quick-head">
+      <text class="symptom-quick-title">最近症状自查</text>
+      <text class="symptom-quick-date">{{symptomPromptCard.date}}</text>
+    </view>
+    <text class="symptom-quick-summary">{{symptomPromptCard.summary}}</text>
+    <button class="symptom-quick-btn" bindtap="onUseSymptomPrompt">基于该记录生成建议</button>
+  </view>
+
+  <!-- 消息列表 -->
+  <scroll-view class="chat-scroll" scroll-y scroll-with-animation scroll-into-view="{{scrollIntoView}}">
+    <view class="chat-list">
+      <view id="{{item.id}}" class="msg-row {{item.role === 'user' ? 'user' : 'ai'}}" wx:for="{{messages}}" wx:key="id">
+        <view class="bubble">
+          <!-- 加载动画 -->
+          <view class="loading-dots" wx:if="{{item.isLoading}}">
+            <view class="dot dot1"></view>
+            <view class="dot dot2"></view>
+            <view class="dot dot3"></view>
+          </view>
+          <!-- 消息内容 -->
+          <text class="msg-text" wx:if="{{!item.isLoading}}">{{item.text}}</text>
+          <!-- 思考过程（可折叠） -->
+          <view class="thinking-section" wx:if="{{item.role === 'ai' && !item.isLoading && item.thinking && item.thinking.steps.length}}">
+            <view class="thinking-toggle" data-idx="{{index}}" bindtap="toggleThinking">
+              <text class="thinking-toggle-text">🔍 思考过程</text>
+              <text class="thinking-arrow {{item.showThinking ? 'open' : ''}}">›</text>
+            </view>
+            <view class="thinking-content" wx:if="{{item.showThinking}}">
+              <view class="thinking-step" wx:for="{{item.thinking.steps}}" wx:for-item="step" wx:key="*this">
+                <text class="thinking-step-text">{{step}}</text>
+              </view>
+            </view>
+          </view>
+          <!-- 引用来源（可折叠） -->
+          <view class="refs-section" wx:if="{{item.role === 'ai' && !item.isLoading && item.references}}">
+            <view class="refs-toggle" data-idx="{{index}}" bindtap="toggleRefs">
+              <text class="refs-toggle-text">引用来源</text>
+              <text class="refs-arrow {{item.showRefs ? 'open' : ''}}">›</text>
+            </view>
+            <view class="refs-content" wx:if="{{item.showRefs}}">
+              <view wx:if="{{item.references.literature.length}}" class="refs-group">
+                <text class="refs-group-title">参考文献</text>
+                <view class="ref-item ref-item-lit" wx:for="{{item.references.literature}}" wx:for-item="lit" wx:key="index"
+                      data-idx="{{index}}" data-lit="{{litIndex}}" wx:for-index="litIndex" bindtap="toggleLitDetail">
+                  <view class="ref-lit-head">
+                    <text class="ref-name">{{lit.index}}. {{lit.title}}</text>
+                    <text class="ref-level level-{{lit.evidenceLevel}}">证据等级：{{lit.evidenceLevel}}</text>
+                    <text class="ref-expand-arrow {{lit.expanded ? 'open' : ''}}" wx:if="{{lit.snippet}}">›</text>
+                  </view>
+                  <view class="ref-snippet" wx:if="{{lit.expanded && lit.snippet}}">
+                    <text class="ref-snippet-text">{{lit.snippet}}</text>
+                  </view>
+                </view>
+              </view>
+              <view wx:if="{{item.references.sn_nodes.length}}" class="refs-group">
+                <text class="refs-group-title">症状网络</text>
+                <view class="ref-item ref-item-node" wx:for="{{item.references.sn_nodes}}" wx:for-item="sn" wx:key="label"
+                      data-label="{{sn.label}}" data-type="sn" bindtap="onRefNodeTap">
+                  <text class="ref-name">{{sn.label}}</text>
+                  <text class="ref-detail">{{sn.group}} · strength {{sn.strength}}</text>
+                  <text class="ref-level high">证据等级：高</text>
+                  <text class="ref-goto">查看图谱 ›</text>
+                </view>
+              </view>
+              <view wx:if="{{item.references.kg_nodes.length}}" class="refs-group">
+                <text class="refs-group-title">知识图谱</text>
+                <view class="ref-item ref-item-node" wx:for="{{item.references.kg_nodes}}" wx:for-item="kg" wx:key="label"
+                      data-label="{{kg.label}}" data-type="kg" bindtap="onRefNodeTap">
+                  <text class="ref-name">{{kg.label}}</text>
+                  <text class="ref-detail">{{kg.type}}</text>
+                  <text class="ref-level high">证据等级：高</text>
+                  <text class="ref-goto">查看图谱 ›</text>
+                </view>
+              </view>
+              <view class="refs-group">
+                <text class="refs-group-title">知识库</text>
+                <view class="ref-item">
+                  <text class="ref-name">Coze RAG 知识库</text>
+                  <text class="ref-level medium">证据等级：中</text>
+                </view>
+              </view>
+            </view>
+          </view>
+          <!-- 应答耗时 -->
+          <text class="elapsed-text" wx:if="{{item.role === 'ai' && !item.isLoading && item.elapsedText}}">应答耗时 {{item.elapsedText}}</text>
+          <!-- 转人工入口 -->
+          <view class="human-tip" wx:if="{{item.role === 'ai' && !item.isLoading && item.needHuman}}">
+            <text class="human-tip-text">没有找到满意的答案？</text>
+            <button class="human-btn" bindtap="onContactHuman">转人工咨询</button>
+          </view>
+          <!-- 反馈按钮 -->
+          <view class="feedback-row" wx:if="{{item.role === 'ai' && !item.isLoading && item.showFeedback && item.qa_id}}">
+            <view class="feedback-btn {{item.feedbackGiven === 'helpful' ? 'active' : ''}}"
+                  data-qaid="{{item.qa_id}}" data-type="helpful" bindtap="onFeedbackTap">
+              <text class="feedback-icon">👍</text>
+              <text>有帮助</text>
+            </view>
+            <view class="feedback-btn {{item.feedbackGiven === 'inaccurate' ? 'active' : ''}}"
+                  data-qaid="{{item.qa_id}}" data-type="inaccurate" bindtap="onFeedbackTap">
+              <text class="feedback-icon">👎</text>
+              <text>不准确</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- 状态提示 -->
+  <view class="status-bar" wx:if="{{statusText}}">
+    <view class="status-dot"></view>
+    <text class="status-text">{{statusText}}</text>
+  </view>
+
+  <!-- 输入栏 -->
+  <view class="input-bar">
+    <input class="input-field" value="{{inputValue}}" bindinput="onInput"
+           bindconfirm="onSend" confirm-type="send"
+           placeholder="请输入你的健康问题" placeholder-class="input-placeholder"
+           disabled="{{isSending}}" />
+    <button class="send-btn {{isSending ? 'disabled' : ''}}" disabled="{{isSending}}" bindtap="onSend">
+      {{isSending ? '...' : '发送'}}
+    </button>
+  </view>
+
+  <!-- 历史会话抽屉 -->
+  <view class="history-mask {{showHistory ? 'show' : ''}}" bindtap="onCloseHistory"></view>
+  <view class="history-drawer {{showHistory ? 'show' : ''}}">
+    <view class="history-header">
+      <text class="history-title">历史会话</text>
+    </view>
+    <scroll-view class="history-list" scroll-y>
+      <view class="history-item {{item._id === currentConversationId ? 'active' : ''}}"
+            wx:for="{{conversations}}" wx:key="_id"
+            data-id="{{item._id}}" bindtap="onSelectConversation"
+            bindlongpress="onRenameConversation">
+        <text class="history-item-title">{{item.title}}</text>
+        <text class="history-item-time">{{item.timeLabel}}</text>
+      </view>
+      <view class="history-empty" wx:if="{{!conversations.length}}">
+        <text>暂无历史会话</text>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 转人工客服弹窗 -->
+  <view class="service-mask {{showServiceModal ? 'show' : ''}}" bindtap="onCloseServiceModal"></view>
+  <view class="service-modal {{showServiceModal ? 'show' : ''}}">
+    <text class="service-title">转人工咨询</text>
+    <view wx:if="{{serviceQrcodeStatus !== 'error'}}" class="service-qrcode-wrap">
+      <image wx:if="{{serviceQrcode}}" class="service-qrcode" src="{{serviceQrcode}}" mode="aspectFit"
+             show-menu-by-longpress bindload="onServiceQrcodeLoad" binderror="onServiceQrcodeError" />
+      <view wx:if="{{serviceQrcodeStatus === 'loading'}}" class="service-qrcode-overlay service-qrcode-loading">
+        <text class="service-loading-text">二维码加载中...</text>
+      </view>
+    </view>
+    <view wx:if="{{serviceQrcodeStatus === 'error'}}" class="service-qrcode service-qrcode-loading">
+      <text class="service-error-text">二维码加载失败，请检查网络后重试</text>
+      <button class="service-retry-btn" bindtap="onRetryServiceQrcode">重新加载</button>
+    </view>
+    <text class="service-desc">长按识别二维码，添加专业人员微信</text>
+    <button class="service-close-btn" bindtap="onCloseServiceModal">关闭</button>
+  </view>
+</view>

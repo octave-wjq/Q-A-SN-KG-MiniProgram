@@ -1,0 +1,47 @@
+.graph-page {
+  width: 100%;
+  height: 100vh;
+  position: relative;
+}
+
+/* cover-view 浮层覆盖在 web-view 之上 */
+.graph-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #F5F6F8;
+}
+
+.graph-spinner {
+  width: 64rpx;
+  height: 64rpx;
+  border: 6rpx solid #E8F9F0;
+  border-top-color: #2DC97E;
+  border-radius: 50%;
+  margin-bottom: 24rpx;
+  animation: graphSpin 0.8s linear infinite;
+}
+
+@keyframes graphSpin {
+  to { transform: rotate(360deg); }
+}
+
+.graph-tip {
+  font-size: 28rpx;
+  color: #6B7A90;
+  margin-bottom: 24rpx;
+}
+
+.graph-retry-btn {
+  padding: 18rpx 56rpx;
+  background: #2DC97E;
+  color: #FFFFFF;
+  font-size: 28rpx;
+  border-radius: 999rpx;
+}

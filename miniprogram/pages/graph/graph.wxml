@@ -1,0 +1,15 @@
+<view class="graph-page">
+  <web-view wx:if="{{url}}" src="{{url}}" bindload="onWebLoad" binderror="onWebError"></web-view>
+
+  <!-- 加载中浮层（web-view 层级高，必须用 cover-view） -->
+  <cover-view class="graph-overlay" wx:if="{{loading}}">
+    <cover-view class="graph-spinner"></cover-view>
+    <cover-view class="graph-tip">图谱加载中{{retryCount > 0 ? '（重试 ' + retryCount + '/5）' : ''}}…</cover-view>
+  </cover-view>
+
+  <!-- 重试耗尽：刷新按钮 -->
+  <cover-view class="graph-overlay" wx:if="{{failed}}">
+    <cover-view class="graph-tip">图谱加载失败</cover-view>
+    <cover-view class="graph-retry-btn" bindtap="onRetry">点击刷新</cover-view>
+  </cover-view>
+</view>

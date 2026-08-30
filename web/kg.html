@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>艾滋病健康教育知识图谱</title>
+  <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+  <style>
+    :root {
+      --bg: #f3f6fb;
+      --card: rgba(255, 255, 255, 0.94);
+      --line: #d7deea;
+      --text: #0f172a;
+      --muted: #5b6475;
+      --accent: #2f6df5;
+      --danger: #c53030;
+      --topbar-h: 96px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 20% 20%, #ffffff 0%, var(--bg) 45%, #e8edf8 100%);
+      font-family: "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      color: var(--text);
+    }
+
+    .app {
+      position: relative;
+      width: 100%;
+      height: 100dvh;
+      overflow: hidden;
+    }
+
+    .top-bar {
+      position: relative;
+      z-index: 20;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .title {
+      width: 100%;
+      margin: 0 0 2px;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+
+    .search-row {
+      display: flex;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .search-row input {
+      flex: 1;
+      min-width: 0;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      font-size: 14px;
+      outline: none;
+      background: #ffffff;
+    }
+
+    .search-row input:focus {
+      border-color: #9fb8ff;
+      box-shadow: 0 0 0 3px rgba(47, 109, 245, 0.15);
+    }
+
+    .action-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      width: 100%;
+    }
+
+    button {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #ffffff;
+      color: var(--text);
+      font-size: 13px;
+      padding: 8px 10px;
+      cursor: pointer;
+      transition: 0.15s ease;
+    }
+
+    button:hover {
+      border-color: #a5b8e8;
+      background: #f7faff;
+    }
+
+    button.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    button.primary:hover {
+      background: #215ad6;
+      border-color: #215ad6;
+    }
+
+    .network-wrap {
+      position: absolute;
+      inset: var(--topbar-h) 0 0 0;
+    }
+
+    #network {
+      width: 100%;
+      height: 100%;
+    }
+
+    .card {
+      position: absolute;
+      z-index: 18;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.1);
+      overflow: hidden;
+    }
+
+    .legend {
+      left: 10px;
+      top: calc(var(--topbar-h) + 10px);
+      width: min(260px, 72vw);
+    }
+
+    .legend-header,
+    .filter-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--line);
+      font-size: 13px;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.95);
+    }
+
+    .legend-body {
+      padding: 8px 10px;
+      max-height: 42vh;
+      overflow: auto;
+    }
+
+    .legend.collapsed .legend-body {
+      display: none;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--muted);
+      padding: 3px 0;
+    }
+
+    .legend-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .swatch {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      flex-shrink: 0;
+    }
+
+    .relation-filter {
+      right: 10px;
+      top: calc(var(--topbar-h) + 10px);
+      width: min(360px, 92vw);
+      max-height: 62vh;
+      display: none;
+      z-index: 30;
+    }
+
+    .relation-filter.open {
+      display: block;
+    }
+
+    .filter-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(248, 250, 255, 0.9);
+    }
+
+    .filter-list {
+      max-height: 45vh;
+      overflow: auto;
+      padding: 6px 10px 10px;
+    }
+
+    .filter-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #344054;
+      padding: 6px 0;
+      border-bottom: 1px dashed #edf1fa;
+    }
+
+    .filter-row:last-child {
+      border-bottom: none;
+    }
+
+    .filter-row label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .filter-count {
+      color: #64748b;
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+
+    .status-chip {
+      position: absolute;
+      z-index: 16;
+      right: 10px;
+      bottom: 12px;
+      padding: 7px 10px;
+      font-size: 12px;
+      color: #334155;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.09);
+    }
+
+    .detail-panel {
+      position: absolute;
+      z-index: 19;
+      left: 10px;
+      right: 10px;
+      bottom: 10px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.97);
+      box-shadow: 0 10px 22px rgba(15, 23, 42, 0.14);
+      display: none;
+      overflow: hidden;
+    }
+
+    .detail-panel.visible {
+      display: block;
+    }
+
+    .detail-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 10px;
+      border-bottom: 1px solid var(--line);
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .detail-body {
+      padding: 9px 10px;
+      font-size: 13px;
+      color: #334155;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+    }
+
+    .detail-row {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .detail-row.full {
+      grid-column: 1 / -1;
+      white-space: normal;
+      word-break: break-word;
+    }
+
+    .message {
+      position: absolute;
+      z-index: 22;
+      left: 50%;
+      top: calc(var(--topbar-h) + 16px);
+      transform: translateX(-50%);
+      background: rgba(17, 24, 39, 0.86);
+      color: #ffffff;
+      padding: 8px 11px;
+      border-radius: 10px;
+      font-size: 12px;
+      display: none;
+      max-width: calc(100vw - 28px);
+      text-align: center;
+    }
+
+    .loading {
+      position: absolute;
+      z-index: 40;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: #1e293b;
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(2px);
+    }
+
+    @media (min-width: 900px) {
+      .top-bar {
+        gap: 10px;
+      }
+
+      .title {
+        width: auto;
+        margin-right: auto;
+      }
+
+      .search-row {
+        width: min(360px, 40vw);
+      }
+
+      .action-row {
+        width: auto;
+      }
+
+      .detail-panel {
+        left: 14px;
+        right: auto;
+        width: min(460px, 62vw);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="top-bar" id="topBar">
+      <h1 class="title">艾滋病健康教育知识图谱</h1>
+      <div class="search-row">
+        <input id="searchInput" type="text" placeholder="输入节点名称（如：发热）" />
+        <button id="searchBtn" class="primary">搜索</button>
+      </div>
+      <div class="action-row">
+        <button id="filterBtn">关系过滤</button>
+        <button id="toggleCoreBtn">加载全部</button>
+        <button id="resetBtn">重置视图</button>
+      </div>
+    </div>
+
+    <div class="network-wrap">
+      <div id="network"></div>
+    </div>
+
+    <div id="legend" class="card legend">
+      <div class="legend-header">
+        <span>节点图例</span>
+        <button id="legendToggleBtn" type="button">折叠</button>
+      </div>
+      <div id="legendBody" class="legend-body"></div>
+    </div>
+
+    <div id="relationFilter" class="card relation-filter">
+      <div class="filter-header">
+        <span>关系过滤</span>
+        <button id="closeFilterBtn" type="button">关闭</button>
+      </div>
+      <div class="filter-actions">
+        <button id="selectAllRelationsBtn" type="button">全选</button>
+        <button id="clearRelationsBtn" type="button">清空</button>
+      </div>
+      <div id="relationList" class="filter-list"></div>
+    </div>
+
+    <div id="statusChip" class="status-chip">加载中...</div>
+
+    <div id="detailPanel" class="detail-panel">
+      <div class="detail-header">
+        <span>节点详情</span>
+        <button id="closeDetailBtn" type="button">关闭</button>
+      </div>
+      <div id="detailBody" class="detail-body"></div>
+    </div>
+
+    <div id="message" class="message"></div>
+    <div id="loading" class="loading">正在加载知识图谱数据...</div>
+  </div>
+
+  <script>
+    (function () {
+      var TYPE_COLORS = {
+        "疾病": "#b42318",
+        "症状": "#1d4ed8",
+        "药物": "#15803d",
+        "人群": "#6d28d9",
+        "传播途径": "#c2410c",
+        "并发症": "#854d0e",
+        "疾病阶段": "#0f766e",
+        "检查": "#0369a1",
+        "干预方法": "#334155",
+        "不良反应": "#9f1239",
+        "证候诊断": "#5b21b6",
+        "其他": "#4b5563"
+      };
+      var CORE_DEGREE_THRESHOLD = 5;
+      var NODE_TYPE_ORDER = [
+        "疾病",
+        "症状",
+        "药物",
+        "人群",
+        "传播途径",
+        "并发症",
+        "疾病阶段",
+        "检查",
+        "干预方法",
+        "不良反应",
+        "证候诊断",
+        "其他"
+      ];
+
+      var topBar = document.getElementById("topBar");
+      var searchInput = document.getElementById("searchInput");
+      var searchBtn = document.getElementById("searchBtn");
+      var filterBtn = document.getElementById("filterBtn");
+      var toggleCoreBtn = document.getElementById("toggleCoreBtn");
+      var resetBtn = document.getElementById("resetBtn");
+      var legend = document.getElementById("legend");
+      var legendToggleBtn = document.getElementById("legendToggleBtn");
+      var legendBody = document.getElementById("legendBody");
+      var relationFilter = document.getElementById("relationFilter");
+      var closeFilterBtn = document.getElementById("closeFilterBtn");
+      var selectAllRelationsBtn = document.getElementById("selectAllRelationsBtn");
+      var clearRelationsBtn = document.getElementById("clearRelationsBtn");
+      var relationList = document.getElementById("relationList");
+      var statusChip = document.getElementById("statusChip");
+      var detailPanel = document.getElementById("detailPanel");
+      var detailBody = document.getElementById("detailBody");
+      var closeDetailBtn = document.getElementById("closeDetailBtn");
+      var message = document.getElementById("message");
+      var loading = document.getElementById("loading");
+      var networkContainer = document.getElementById("network");
+
+      var rawData = null;
+      var nodeMap = new Map();
+      var showAllNodes = false;
+      var selectedRelations = new Set();
+      var network = null;
+      var nodeDataSet = null;
+      var edgeDataSet = null;
+      var messageTimer = null;
+
+      function degree(node) {
+        return Number(node.in_degree || 0) + Number(node.out_degree || 0);
+      }
+
+      function showMessage(text) {
+        if (messageTimer) {
+          clearTimeout(messageTimer);
+        }
+        message.textContent = text;
+        message.style.display = "block";
+        messageTimer = setTimeout(function () {
+          message.style.display = "none";
+        }, 2300);
+      }
+
+      function updateTopOffset() {
+        var h = topBar ? topBar.offsetHeight : 96;
+        document.documentElement.style.setProperty("--topbar-h", h + "px");
+      }
+
+      function getTypeColor(typeName) {
+        return TYPE_COLORS[typeName] || TYPE_COLORS["其他"];
+      }
+
+      function createNodeViewModel(node) {
+        return {
+          id: node.id,
+          label: node.label,
+          shape: "box",
+          margin: 8,
+          shapeProperties: { borderRadius: 6 },
+          font: {
+            size: 14,
+            color: "#ffffff",
+            face: "PingFang SC, Microsoft YaHei, Helvetica Neue, Helvetica, Arial, sans-serif"
+          },
+          color: {
+            background: getTypeColor(node.primary_type),
+            border: "rgba(255,255,255,0.28)",
+            highlight: {
+              background: getTypeColor(node.primary_type),
+              border: "#f8fafc"
+            }
+          },
+          borderWidth: 1,
+          title: node.label + "\n类型: " + (node.primary_type || "其他") + "\n总度数: " + degree(node)
+        };
+      }
+
+      function baseEdgeStyle(edge) {
+        return {
+          id: edge.id,
+          from: edge.source,
+          to: edge.target,
+          arrows: "to",
+          label: edge.relation_label || edge.relation || "",
+          relation: edge.relation,
+          smooth: {
+            enabled: true,
+            type: "continuous",
+            roundness: 0.22
+          },
+          color: {
+            color: "rgba(128, 138, 156, 0.55)",
+            highlight: "#2f6df5",
+            hover: "#2f6df5",
+            inherit: false
+          },
+          font: {
+            size: 10,
+            color: "#5b6475",
+            background: "rgba(255,255,255,0.78)",
+            strokeWidth: 0
+          },
+          width: 1.2
+        };
+      }
+
+      function buildVisibleGraph() {
+        var nodes = rawData.nodes;
+        var edges = rawData.edges;
+
+        var candidateNodes = showAllNodes
+          ? nodes
+          : nodes.filter(function (node) {
+              return degree(node) >= CORE_DEGREE_THRESHOLD;
+            });
+
+        var candidateIdSet = new Set(
+          candidateNodes.map(function (node) {
+            return node.id;
+          })
+        );
+
+        var visibleEdges = edges.filter(function (edge) {
+          return (
+            candidateIdSet.has(edge.source) &&
+            candidateIdSet.has(edge.target) &&
+            selectedRelations.has(edge.relation)
+          );
+        });
+
+        return {
+          nodes: candidateNodes,
+          edges: visibleEdges,
+          candidateNodeCount: candidateNodes.length
+        };
+      }
+
+      function updateStatus(visibleNodeCount, visibleEdgeCount, candidateNodeCount) {
+        var modeText = showAllNodes ? "全部模式" : "核心模式(度>=5)";
+        statusChip.textContent =
+          modeText +
+          " · 显示节点 " +
+          visibleNodeCount +
+          "/" +
+          rawData.stats.node_count +
+          " · 显示边 " +
+          visibleEdgeCount +
+          "/" +
+          rawData.stats.edge_count +
+          " · 候选节点 " +
+          candidateNodeCount;
+      }
+
+      function renderLegend() {
+        var typeCounts = rawData.stats && rawData.stats.type_counts ? rawData.stats.type_counts : {};
+        var lines = [];
+
+        NODE_TYPE_ORDER.forEach(function (typeName) {
+          if (typeof typeCounts[typeName] !== "undefined") {
+            lines.push({
+              type: typeName,
+              count: typeCounts[typeName]
+            });
+          }
+        });
+
+        Object.keys(typeCounts).forEach(function (typeName) {
+          if (NODE_TYPE_ORDER.indexOf(typeName) === -1) {
+            lines.push({ type: typeName, count: typeCounts[typeName] });
+          }
+        });
+
+        legendBody.innerHTML = lines
+          .map(function (item) {
+            return (
+              '<div class="legend-item">' +
+              '<div class="legend-left">' +
+              '<span class="swatch" style="background:' + getTypeColor(item.type) + '"></span>' +
+              "<span>" +
+              item.type +
+              "</span>" +
+              "</div>" +
+              '<span class="filter-count">' +
+              item.count +
+              "</span>" +
+              "</div>"
+            );
+          })
+          .join("");
+      }
+
+      function renderRelationFilter() {
+        var relationDefs = (rawData.relation_definitions || []).slice().sort(function (a, b) {
+          return Number(b.count || 0) - Number(a.count || 0);
+        });
+
+        relationList.innerHTML = relationDefs
+          .map(function (relation) {
+            var checked = selectedRelations.has(relation.id) ? "checked" : "";
+            return (
+              '<div class="filter-row">' +
+              '<label for="rel_' +
+              relation.id +
+              '">' +
+              '<span><input id="rel_' +
+              relation.id +
+              '" type="checkbox" data-relation-id="' +
+              relation.id +
+              '" ' +
+              checked +
+              " /> " +
+              relation.label +
+              "</span>" +
+              '<span class="filter-count">' +
+              (relation.count || 0) +
+              "</span>" +
+              "</label>" +
+              "</div>"
+            );
+          })
+          .join("");
+
+        relationList.addEventListener("change", function (event) {
+          var target = event.target;
+          if (!target || target.type !== "checkbox") {
+            return;
+          }
+          var relationId = target.getAttribute("data-relation-id");
+          if (!relationId) {
+            return;
+          }
+          if (target.checked) {
+            selectedRelations.add(relationId);
+          } else {
+            selectedRelations.delete(relationId);
+          }
+          renderNetwork();
+        });
+      }
+
+      function applyDefaultEdgeStyles() {
+        if (!edgeDataSet) {
+          return;
+        }
+        var edgeIds = edgeDataSet.getIds();
+        var updates = edgeIds.map(function (id) {
+          return {
+            id: id,
+            color: {
+              color: "rgba(128, 138, 156, 0.55)",
+              highlight: "#2f6df5",
+              hover: "#2f6df5",
+              inherit: false
+            },
+            width: 1.2,
+            font: {
+              size: 10,
+              color: "#5b6475",
+              background: "rgba(255,255,255,0.78)",
+              strokeWidth: 0
+            }
+          };
+        });
+        edgeDataSet.update(updates);
+      }
+
+      function highlightEdgesForNode(nodeId) {
+        if (!network || !edgeDataSet) {
+          return;
+        }
+        var connected = new Set(network.getConnectedEdges(nodeId));
+        var edgeIds = edgeDataSet.getIds();
+        var updates = edgeIds.map(function (id) {
+          if (connected.has(id)) {
+            return {
+              id: id,
+              color: {
+                color: "#2f6df5",
+                highlight: "#2f6df5",
+                hover: "#2f6df5",
+                inherit: false
+              },
+              width: 2.6,
+              font: {
+                size: 11,
+                color: "#1e429f",
+                background: "rgba(255,255,255,0.9)",
+                strokeWidth: 0
+              }
+            };
+          }
+          return {
+            id: id,
+            color: {
+              color: "rgba(160, 170, 186, 0.16)",
+              highlight: "rgba(160, 170, 186, 0.16)",
+              hover: "rgba(160, 170, 186, 0.16)",
+              inherit: false
+            },
+            width: 1,
+            font: {
+              size: 10,
+              color: "rgba(107, 114, 128, 0.28)",
+              background: "rgba(255,255,255,0.5)",
+              strokeWidth: 0
+            }
+          };
+        });
+        edgeDataSet.update(updates);
+      }
+
+      function highlightNodesForNode(nodeId) {
+        if (!network || !nodeDataSet) {
+          return;
+        }
+        var keep = new Set([nodeId].concat(network.getConnectedNodes(nodeId)));
+        var updates = nodeDataSet.getIds().map(function (id) {
+          if (keep.has(id)) {
+            return {
+              id: id,
+              opacity: 1,
+              borderWidth: id === nodeId ? 2.6 : 1,
+              font: {
+                size: 14,
+                color: "#ffffff",
+                face: "PingFang SC, Microsoft YaHei, Helvetica Neue, Helvetica, Arial, sans-serif"
+              }
+            };
+          }
+          return {
+            id: id,
+            opacity: 0.15,
+            borderWidth: 1,
+            font: {
+              size: 14,
+              color: "rgba(120, 120, 120, 0.25)",
+              face: "PingFang SC, Microsoft YaHei, Helvetica Neue, Helvetica, Arial, sans-serif"
+            }
+          };
+        });
+        nodeDataSet.update(updates);
+      }
+
+      function resetNodeStyles() {
+        if (!nodeDataSet) {
+          return;
+        }
+        var updates = nodeDataSet.getIds().map(function (id) {
+          return {
+            id: id,
+            opacity: 1,
+            borderWidth: 1,
+            font: {
+              size: 14,
+              color: "#ffffff",
+              face: "PingFang SC, Microsoft YaHei, Helvetica Neue, Helvetica, Arial, sans-serif"
+            }
+          };
+        });
+        nodeDataSet.update(updates);
+      }
+
+      function showNodeDetail(nodeId) {
+        var node = nodeMap.get(nodeId);
+        if (!node) {
+          return;
+        }
+        var connectedEdges = network ? network.getConnectedEdges(nodeId).length : 0;
+        detailBody.innerHTML =
+          '<div class="detail-row full"><strong>名称：</strong>' +
+          node.label +
+          "</div>" +
+          '<div class="detail-row"><strong>类型：</strong>' +
+          (node.primary_type || "其他") +
+          "</div>" +
+          '<div class="detail-row"><strong>总度数：</strong>' +
+          degree(node) +
+          "</div>" +
+          '<div class="detail-row"><strong>入度：</strong>' +
+          Number(node.in_degree || 0) +
+          "</div>" +
+          '<div class="detail-row"><strong>出度：</strong>' +
+          Number(node.out_degree || 0) +
+          "</div>" +
+          '<div class="detail-row"><strong>当前可见关联边：</strong>' +
+          connectedEdges +
+          "</div>";
+        detailPanel.classList.add("visible");
+      }
+
+      function hideNodeDetail() {
+        detailPanel.classList.remove("visible");
+      }
+
+      function renderNetwork() {
+        var graph = buildVisibleGraph();
+
+        var nodeItems = graph.nodes.map(createNodeViewModel);
+        var edgeItems = graph.edges.map(baseEdgeStyle);
+
+        if (!network) {
+          nodeDataSet = new vis.DataSet(nodeItems);
+          edgeDataSet = new vis.DataSet(edgeItems);
+          network = new vis.Network(
+            networkContainer,
+            { nodes: nodeDataSet, edges: edgeDataSet },
+            {
+              autoResize: true,
+              interaction: {
+                hover: true,
+                dragView: true,
+                zoomView: true,
+                tooltipDelay: 120
+              },
+              physics: {
+                enabled: true,
+                solver: "barnesHut",
+                barnesHut: {
+                  gravitationalConstant: -3200,
+                  springConstant: 0.04,
+                  springLength: 120,
+                  damping: 0.12,
+                  avoidOverlap: 0.12
+                },
+                stabilization: {
+                  enabled: true,
+                  iterations: 220,
+                  updateInterval: 25
+                }
+              },
+              layout: {
+                improvedLayout: true
+              },
+              edges: {
+                arrows: { to: { enabled: true, scaleFactor: 0.7 } },
+                smooth: { enabled: true, type: "continuous", roundness: 0.22 }
+              }
+            }
+          );
+
+          network.on("click", function (params) {
+            if (params.nodes && params.nodes.length) {
+              var nodeId = params.nodes[0];
+              showNodeDetail(nodeId);
+              highlightEdgesForNode(nodeId);
+              highlightNodesForNode(nodeId);
+            } else {
+              hideNodeDetail();
+              applyDefaultEdgeStyles();
+            }
+          });
+        } else {
+          nodeDataSet.clear();
+          edgeDataSet.clear();
+          nodeDataSet.add(nodeItems);
+          edgeDataSet.add(edgeItems);
+          hideNodeDetail();
+        }
+
+        applyDefaultEdgeStyles();
+
+        updateStatus(graph.nodes.length, graph.edges.length, graph.candidateNodeCount);
+
+        if (!graph.nodes.length || !graph.edges.length) {
+          showMessage("当前筛选结果为空，请调整关系过滤或节点范围");
+        }
+      }
+
+      function trySearchAndFocus() {
+        if (!rawData || !nodeDataSet || !network) {
+          showMessage("图谱尚未加载完成");
+          return;
+        }
+
+        var keyword = (searchInput.value || "").trim().toLowerCase();
+        if (!keyword) {
+          showMessage("请输入要搜索的节点名称");
+          return;
+        }
+
+        var targetNode = rawData.nodes.find(function (node) {
+          return String(node.label || "").toLowerCase() === keyword;
+        });
+
+        if (!targetNode) {
+          targetNode = rawData.nodes.find(function (node) {
+            return String(node.label || "").toLowerCase().indexOf(keyword) !== -1;
+          });
+        }
+
+        if (!targetNode) {
+          showMessage("未找到匹配节点");
+          return;
+        }
+
+        if (!showAllNodes && degree(targetNode) < CORE_DEGREE_THRESHOLD) {
+          showAllNodes = true;
+          toggleCoreBtn.textContent = "只看核心";
+          renderNetwork();
+        }
+
+        if (!nodeDataSet.get(targetNode.id)) {
+          showMessage("节点存在，但不在当前关系筛选结果中");
+          return;
+        }
+
+        network.selectNodes([targetNode.id]);
+        network.focus(targetNode.id, {
+          scale: 1.22,
+          animation: {
+            duration: 700,
+            easingFunction: "easeInOutQuad"
+          }
+        });
+        showNodeDetail(targetNode.id);
+        highlightEdgesForNode(targetNode.id);
+        highlightNodesForNode(targetNode.id);
+      }
+
+      function bindEvents() {
+        window.addEventListener("resize", updateTopOffset);
+
+        searchBtn.addEventListener("click", trySearchAndFocus);
+        searchInput.addEventListener("keydown", function (event) {
+          if (event.key === "Enter") {
+            trySearchAndFocus();
+          }
+        });
+
+        legendToggleBtn.addEventListener("click", function () {
+          legend.classList.toggle("collapsed");
+          legendToggleBtn.textContent = legend.classList.contains("collapsed") ? "展开" : "折叠";
+        });
+
+        filterBtn.addEventListener("click", function () {
+          relationFilter.classList.toggle("open");
+        });
+
+        closeFilterBtn.addEventListener("click", function () {
+          relationFilter.classList.remove("open");
+        });
+
+        selectAllRelationsBtn.addEventListener("click", function () {
+          selectedRelations = new Set(
+            (rawData.relation_definitions || []).map(function (relation) {
+              return relation.id;
+            })
+          );
+          var checkboxes = relationList.querySelectorAll('input[type="checkbox"]');
+          checkboxes.forEach(function (input) {
+            input.checked = true;
+          });
+          renderNetwork();
+        });
+
+        clearRelationsBtn.addEventListener("click", function () {
+          selectedRelations.clear();
+          var checkboxes = relationList.querySelectorAll('input[type="checkbox"]');
+          checkboxes.forEach(function (input) {
+            input.checked = false;
+          });
+          renderNetwork();
+        });
+
+        toggleCoreBtn.addEventListener("click", function () {
+          showAllNodes = !showAllNodes;
+          toggleCoreBtn.textContent = showAllNodes ? "只看核心" : "加载全部";
+          renderNetwork();
+        });
+
+        resetBtn.addEventListener("click", function () {
+          if (network) {
+            network.fit({
+              animation: {
+                duration: 600,
+                easingFunction: "easeInOutQuad"
+              }
+            });
+          }
+          hideNodeDetail();
+          applyDefaultEdgeStyles();
+        });
+
+        closeDetailBtn.addEventListener("click", function () {
+          hideNodeDetail();
+          applyDefaultEdgeStyles();
+          if (network) {
+            network.unselectAll();
+          }
+        });
+
+        document.addEventListener("click", function (event) {
+          if (!relationFilter.classList.contains("open")) {
+            return;
+          }
+          var target = event.target;
+          if (!relationFilter.contains(target) && target !== filterBtn) {
+            relationFilter.classList.remove("open");
+          }
+        });
+      }
+
+      function initialize(data) {
+        rawData = data;
+        nodeMap = new Map(
+          rawData.nodes.map(function (node) {
+            return [node.id, node];
+          })
+        );
+
+        selectedRelations = new Set(
+          (rawData.relation_definitions || []).map(function (relation) {
+            return relation.id;
+          })
+        );
+
+        renderLegend();
+        renderRelationFilter();
+        renderNetwork();
+        updateTopOffset();
+        bindEvents();
+      }
+
+      fetch("/data/kg_graph_vis.json")
+        .then(function (response) {
+          if (!response.ok) {
+            throw new Error("HTTP " + response.status);
+          }
+          return response.json();
+        })
+        .then(function (data) {
+          initialize(data);
+        })
+        .catch(function (error) {
+          showMessage("数据加载失败：" + error.message);
+          statusChip.textContent = "数据加载失败";
+        })
+        .finally(function () {
+          loading.style.display = "none";
+        });
+    })();
+  </script>
+</body>
+</html>

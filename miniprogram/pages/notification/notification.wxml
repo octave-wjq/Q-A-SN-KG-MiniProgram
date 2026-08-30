@@ -1,0 +1,64 @@
+<view class="container notification-page">
+  <view class="card intro-card">
+    <text class="intro-title">消息通知</text>
+    <text class="intro-desc">用药与复诊提醒</text>
+  </view>
+
+  <view class="filter-row">
+    <view
+      class="filter-chip {{activeFilter === 'all' ? 'active' : ''}}"
+      data-filter="all"
+      bindtap="onFilterTap"
+    >全部</view>
+    <view
+      class="filter-chip {{activeFilter === 'medication' ? 'active' : ''}}"
+      data-filter="medication"
+      bindtap="onFilterTap"
+    >用药提醒</view>
+    <view
+      class="filter-chip {{activeFilter === 'appointment' ? 'active' : ''}}"
+      data-filter="appointment"
+      bindtap="onFilterTap"
+    >复诊提醒</view>
+  </view>
+
+  <block wx:if="{{activeFilter === 'all' || activeFilter === 'medication'}}">
+    <view class="card notice-card" wx:for="{{medications}}" wx:key="reminderId">
+      <view class="notice-icon med">💊</view>
+      <view class="notice-body">
+        <text class="notice-title">{{item.medicationName}} {{item.dosage}}</text>
+        <text class="notice-desc">{{item.time}} 该服药了</text>
+      </view>
+      <button
+        class="notice-btn"
+        data-reminder-id="{{item.reminderId}}"
+        data-medication-id="{{item.medicationId}}"
+        bindtap="onMarkTaken"
+      >标记已服</button>
+    </view>
+  </block>
+
+  <block wx:if="{{activeFilter === 'all' || activeFilter === 'appointment'}}">
+    <view class="card notice-card" wx:for="{{appointments}}" wx:key="id">
+      <view class="notice-icon appt">📅</view>
+      <view class="notice-body">
+        <text class="notice-title">{{item.hospital}} · {{item.department}}</text>
+        <text class="notice-desc">{{item.doctor}}　{{item.date}} {{item.time}}</text>
+        <view class="days-badge">还有{{item.daysLeft}}天</view>
+      </view>
+      <button
+        class="notice-btn"
+        data-id="{{item.id}}"
+        bindtap="onMarkCompleted"
+      >标记完成</button>
+    </view>
+  </block>
+
+  <view
+    class="empty-box"
+    wx:if="{{!loading && medications.length === 0 && appointments.length === 0}}"
+  >
+    <text class="empty-icon">🔔</text>
+    <text class="empty-text">暂无待办提醒</text>
+  </view>
+</view>

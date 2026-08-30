@@ -1,0 +1,322 @@
+.profile-page {
+  padding: 24rpx;
+  padding-bottom: 60rpx;
+  min-height: 100vh;
+  background: #F5F9FF;
+  box-sizing: border-box;
+}
+
+/* 用户信息卡片 */
+.user-card {
+  display: flex;
+  align-items: center;
+  padding: 32rpx 24rpx;
+  background: linear-gradient(135deg, #2DC97E, #3FD9A0);
+  border-radius: 20rpx;
+  color: #FFFFFF;
+  position: relative;
+}
+
+.avatar {
+  width: 112rpx;
+  height: 112rpx;
+  border-radius: 50%;
+  border: 4rpx solid rgba(255, 255, 255, 0.4);
+  flex-shrink: 0;
+}
+
+.avatar-default {
+  opacity: 0.7;
+}
+
+.user-main {
+  margin-left: 20rpx;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.nickname {
+  font-size: 34rpx;
+  font-weight: 600;
+}
+
+.user-id {
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  opacity: 0.85;
+}
+
+.edit-btn {
+  padding: 8rpx 20rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.edit-btn-text {
+  font-size: 24rpx;
+  color: #FFFFFF;
+}
+
+/* 登录引导卡片 */
+.login-card {
+  padding: 40rpx 24rpx;
+  border-radius: 20rpx;
+  background: #FFFFFF;
+  box-shadow: 0 8rpx 24rpx rgba(31, 45, 61, 0.06);
+}
+
+.login-info {
+  display: flex;
+  align-items: center;
+}
+
+.login-text {
+  margin-left: 20rpx;
+  display: flex;
+  flex-direction: column;
+}
+
+.login-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1F2D3D;
+}
+
+.login-desc {
+  margin-top: 6rpx;
+  font-size: 24rpx;
+  color: #7D8DA6;
+}
+
+.login-btn {
+  margin-top: 32rpx;
+  height: 80rpx;
+  min-height: 80rpx;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999rpx;
+  background: linear-gradient(135deg, #2DC97E, #3FD9A0);
+  color: #FFFFFF;
+  font-size: 30rpx;
+  border: none;
+}
+
+.login-btn::after {
+  border: none;
+}
+
+/* 菜单卡片 */
+.menu-card {
+  margin-top: 24rpx;
+  padding: 4rpx 24rpx;
+  border-radius: 20rpx;
+  background: #FFFFFF;
+  box-shadow: 0 8rpx 24rpx rgba(31, 45, 61, 0.06);
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28rpx 0;
+  border-bottom: 1rpx solid #F0F4F8;
+}
+
+.menu-item:last-child {
+  border-bottom: none;
+}
+
+.menu-title {
+  font-size: 28rpx;
+  color: #1F2D3D;
+}
+
+.menu-arrow {
+  font-size: 32rpx;
+  color: #C0C8D4;
+}
+
+/* 退出按钮 */
+.logout-btn {
+  margin-top: 40rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+  border-radius: 999rpx;
+  background: #FFFFFF;
+  color: #FF4D4F;
+  font-size: 28rpx;
+  border: 1rpx solid #FFD6D6;
+  box-shadow: 0 4rpx 12rpx rgba(255, 77, 79, 0.06);
+  padding: 0;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logout-btn::after {
+  border: none;
+}
+
+/* 编辑资料面板 */
+.edit-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s;
+  z-index: 100;
+}
+
+.edit-mask.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.edit-panel {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #FFFFFF;
+  border-radius: 24rpx 24rpx 0 0;
+  transform: translateY(100%);
+  transition: transform 0.3s;
+  z-index: 101;
+  padding: 0 32rpx 60rpx;
+  padding-bottom: calc(60rpx + env(safe-area-inset-bottom));
+}
+
+.edit-panel.show {
+  transform: translateY(0);
+}
+
+.edit-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28rpx 0;
+  border-bottom: 1rpx solid #F0F4F8;
+}
+
+.edit-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1F2D3D;
+}
+
+.edit-close {
+  font-size: 28rpx;
+  color: #2DC97E;
+}
+
+.edit-form {
+  padding-top: 16rpx;
+}
+
+.edit-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid #F0F4F8;
+}
+
+.edit-label {
+  font-size: 28rpx;
+  color: #1F2D3D;
+  flex-shrink: 0;
+}
+
+.avatar-chooser {
+  display: flex;
+  align-items: center;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  border: none;
+  line-height: normal;
+}
+
+.avatar-chooser::after {
+  border: none;
+}
+
+.avatar-preview {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+}
+
+.edit-input {
+  flex: 1;
+  text-align: right;
+  font-size: 28rpx;
+  color: #1F2D3D;
+  margin-left: 24rpx;
+}
+
+.edit-arrow {
+  margin-left: 12rpx;
+  font-size: 32rpx;
+  color: #C0C8D4;
+}
+
+.save-btn {
+  margin-top: 40rpx;
+  height: 80rpx;
+  min-height: 80rpx;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999rpx;
+  background: linear-gradient(135deg, #2DC97E, #3FD9A0);
+  color: #FFFFFF;
+  font-size: 30rpx;
+  border: none;
+}
+
+.save-btn::after {
+  border: none;
+}
+
+/* 反馈建议弹窗 */
+.fb-mask {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+  opacity: 0; visibility: hidden; transition: all 0.3s; z-index: 200;
+}
+.fb-mask.show { opacity: 1; visibility: visible; }
+.fb-panel {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 201;
+  background: #FFFFFF; border-radius: 24rpx 24rpx 0 0;
+  padding: 32rpx 32rpx calc(40rpx + env(safe-area-inset-bottom));
+  transform: translateY(100%); transition: transform 0.3s;
+}
+.fb-panel.show { transform: translateY(0); }
+.fb-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24rpx; }
+.fb-title { font-size: 32rpx; font-weight: 600; color: #1F2D3D; }
+.fb-close { font-size: 28rpx; color: #2DC97E; }
+.fb-textarea {
+  width: 100%; height: 200rpx; max-height: 200rpx; padding: 20rpx; box-sizing: border-box;
+  background: #F5F6F8; border-radius: 16rpx; font-size: 28rpx; color: #1F2D3D; display: block;
+}
+.fb-contact {
+  width: 100%; height: 88rpx; margin-top: 24rpx; padding: 0 20rpx; box-sizing: border-box;
+  background: #F5F6F8; border-radius: 16rpx; font-size: 28rpx; color: #1F2D3D; display: block;
+}
+.fb-submit {
+  margin-top: 28rpx; height: 84rpx; min-height: 84rpx; padding: 0;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 999rpx; background: linear-gradient(135deg, #2DC97E, #3FD9A0);
+  color: #FFFFFF; font-size: 30rpx; border: none;
+}
+.fb-submit::after { border: none; }
+.fb-submit.disabled { opacity: 0.6; }

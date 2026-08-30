@@ -1,0 +1,79 @@
+<view class="container profile-page">
+  <!-- 已登录：用户信息卡片 -->
+  <view class="card user-card" wx:if="{{isLogin}}">
+    <image class="avatar" src="{{userInfo.avatarUrl}}" mode="aspectFill" />
+    <view class="user-main">
+      <text class="nickname">{{userInfo.nickName}}</text>
+      <text class="user-id">ID：{{userId}}</text>
+    </view>
+    <view class="edit-btn" bindtap="onEditProfile">
+      <text class="edit-btn-text">编辑</text>
+    </view>
+  </view>
+
+  <!-- 未登录：引导登录卡片 -->
+  <view class="card login-card" wx:else>
+    <view class="login-info">
+      <image class="avatar avatar-default" src="{{defaultAvatar}}" mode="aspectFill" />
+      <view class="login-text">
+        <text class="login-title">登录后享受完整服务</text>
+        <text class="login-desc">问答历史、健康记录将自动同步</text>
+      </view>
+    </view>
+    <button class="login-btn" bindtap="handleLogin">微信登录</button>
+  </view>
+
+  <!-- 编辑资料弹窗 -->
+  <view class="edit-mask {{showEditPanel ? 'show' : ''}}" bindtap="onCloseEdit"></view>
+  <view class="edit-panel {{showEditPanel ? 'show' : ''}}">
+    <view class="edit-header">
+      <text class="edit-title">编辑资料</text>
+      <text class="edit-close" bindtap="onCloseEdit">完成</text>
+    </view>
+    <view class="edit-form">
+      <view class="edit-row">
+        <text class="edit-label">头像</text>
+        <button class="avatar-chooser" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
+          <image class="avatar-preview" src="{{editAvatar || userInfo.avatarUrl}}" mode="aspectFill" />
+          <text class="edit-arrow">›</text>
+        </button>
+      </view>
+      <view class="edit-row">
+        <text class="edit-label">昵称</text>
+        <input class="edit-input" type="nickname" placeholder="请输入昵称"
+               value="{{editNickName}}" bindinput="onNickNameInput" bindchange="onNickNameChange" />
+      </view>
+    </view>
+    <button class="save-btn" bindtap="onSaveProfile">保存</button>
+  </view>
+
+  <!-- 功能菜单 -->
+  <view class="card menu-card">
+    <view class="menu-item" wx:for="{{menuList}}" wx:key="key"
+          data-key="{{item.key}}" bindtap="onMenuTap">
+      <text class="menu-title">{{item.title}}</text>
+      <text class="menu-arrow">›</text>
+    </view>
+    <view class="menu-item" wx:if="{{isAdmin}}" data-key="admin" bindtap="onMenuTap">
+      <text class="menu-title">数据管理</text>
+      <text class="menu-arrow">›</text>
+    </view>
+  </view>
+
+  <!-- 退出登录 -->
+  <button wx:if="{{isLogin}}" class="logout-btn" bindtap="handleLogout">退出登录</button>
+
+  <!-- 反馈建议弹窗 -->
+  <view class="fb-mask {{showFeedbackPanel ? 'show' : ''}}" bindtap="onCloseFeedback"></view>
+  <view class="fb-panel {{showFeedbackPanel ? 'show' : ''}}" catchtap="noop">
+    <view class="fb-header">
+      <text class="fb-title">反馈建议</text>
+      <text class="fb-close" bindtap="onCloseFeedback">关闭</text>
+    </view>
+    <textarea class="fb-textarea" placeholder="请描述你遇到的问题或建议（最多1000字）"
+              maxlength="1000" value="{{feedbackContent}}" bindinput="onFeedbackInput" />
+    <input class="fb-contact" placeholder="联系方式（选填，便于回复）"
+           value="{{feedbackContact}}" bindinput="onFeedbackContactInput" />
+    <button class="fb-submit {{feedbackSubmitting ? 'disabled' : ''}}" disabled="{{feedbackSubmitting}}" bindtap="onSubmitFeedback">提交反馈</button>
+  </view>
+</view>
