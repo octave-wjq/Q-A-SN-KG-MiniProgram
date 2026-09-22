@@ -1,10 +1,13 @@
 const cloud = require('wx-server-sdk')
+const { resolveIdentity } = require('./identity')
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 
 const db = cloud.database()
 const PAGE_SIZE = 100
 const VALID_INTERVENTION_TYPES = ['alleviate', 'aggravate']
+
+const PREFIX = 'snkg-'
 
 function ok(data) {
   return { code: 0, message: 'success', data }
@@ -24,7 +27,7 @@ function normalizeStrength(item) {
 }
 
 async function handleGraph() {
-  const result = await db.collection('sn_graph').doc('sn_graph_v1').get()
+  const result = await db.collection(PREFIX + 'sn_graph').doc('sn_graph_v1').get()
   const data = result.data || {}
 
   return ok({
@@ -44,7 +47,7 @@ async function handleCentrality(params) {
     }
   }
 
-  const result = await db.collection('sn_centrality').doc('sn_centrality_v1').get()
+  const result = await db.collection(PREFIX + 'sn_centrality').doc('sn_centrality_v1').get()
   const rankings = Array.isArray(result.data?.rankings) ? result.data.rankings.slice() : []
 
   rankings.sort((a, b) => normalizeStrength(b) - normalizeStrength(a))
@@ -65,7 +68,7 @@ async function handleSimulate(params) {
   }
 
   const docId = `sim_${node_id}_${intervention_type}`
-  const result = await db.collection('sn_simulation').doc(docId).get()
+  const result = await db.collection(PREFIX + 'sn_simulation').doc(docId).get()
 
   return ok(result.data || {})
 }
@@ -75,7 +78,7 @@ async function queryAllSimulations(interventionType) {
   let skip = 0
 
   while (true) {
-    const result = await db.collection('sn_simulation')
+    const result = await db.collection(PREFIX + 'sn_simulation')
       .where({ intervention_type: interventionType })
       .skip(skip)
       .limit(PAGE_SIZE)
@@ -114,7 +117,7 @@ async function handleSpillover(params) {
   }
 
   const docId = `spillover_${intervention_type}`
-  const result = await db.collection('sn_spillover').doc(docId).get()
+  const result = await db.collection(PREFIX + 'sn_spillover').doc(docId).get()
   const data = result.data || {}
 
   return ok({
@@ -125,6 +128,10 @@ async function handleSpillover(params) {
 
 exports.main = async (event, context) => {
   const { action, ...params } = event || {}
+  const identity = resolveIdentity(cloud.getWXContext())
+  if (!identity.valid) {
+    return { code: 401, message: 'unauthorized', data: null }
+  }
 
   try {
     switch (action) {

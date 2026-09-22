@@ -1,12 +1,30 @@
 const { callCloud } = require('../../utils/api')
+const sharedCloud = require('../../utils/cloud')
 const { showLoading, hideLoading, showToast } = require('../../utils/util')
 
 const DEFAULT_AVATAR = '/images/default-avatar.png'
 const ADMIN_OPENIDS = ['oQ0UG7ooFWi9ekMxXK9bO9HM9OOY']
 
+// 将头像地址解析为可直接展示的地址；cloud:// fileID 走共享实例解析为临时 https 地址，
+// 其它（默认图 / 外部 URL）原样返回。持久 fileID 始终保留，不回写短期地址。
+function resolveAvatarForDisplay(url) {
+  if (!url) return Promise.resolve('')
+  if (typeof url === 'string' && url.indexOf('cloud://') === 0) {
+    return sharedCloud.resolveForDisplay(url).catch(() => '')
+  }
+  return Promise.resolve(url)
+}
+
+// 当前用户 openid（本地缓存优先，兼容 globalData 中已有的身份字段）；登出后为空字符串
+function currentOpenid() {
+  const app = getApp()
+  const userInfo = app.globalData.userInfo || wx.getStorageSync('userInfo') || null
+  return wx.getStorageSync('openid') || (userInfo && userInfo.openid) || ''
+}
+
 Page({
   data: {
-    userInfo: { nickName: '', avatarUrl: DEFAULT_AVATAR },
+    userInfo: { nickName: '', avatarUrl: DEFAULT_AVATAR, avatarDisplay: DEFAULT_AVATAR },
     userId: '',
     isLogin: false,
     isAdmin: false,
@@ -36,22 +54,47 @@ Page({
     const currentUser = app.globalData.userInfo || cachedUser
 
     if (currentUser && cachedOpenid) {
+      const persistentAvatar = currentUser.avatarUrl || DEFAULT_AVATAR
+      // cloud:// fileID 在共享环境下不可直接渲染：解析请求期间先用默认头像占位，
+      // 解析成功后才换成 https；解析失败保持占位，绝不把 fileID 写入展示字段。
+      const isCloudAvatar = typeof persistentAvatar === 'string' && persistentAvatar.indexOf('cloud://') === 0
       this.setData({
         isLogin: true,
         isAdmin: ADMIN_OPENIDS.includes(cachedOpenid),
+        // avatarUrl 始终保留持久 fileID（不回写临时地址）
         userInfo: {
           nickName: currentUser.nickName || '微信用户',
-          avatarUrl: currentUser.avatarUrl || DEFAULT_AVATAR
+          avatarUrl: persistentAvatar,
+          avatarDisplay: isCloudAvatar ? DEFAULT_AVATAR : persistentAvatar
         },
         userId: cachedOpenid.slice(-8)
       })
+      this.refreshAvatarDisplay(persistentAvatar)
     } else {
+      // 每次展示/登出都作废在途解析，避免旧结果迟到覆盖游客展示
+      this._avatarGeneration = (this._avatarGeneration || 0) + 1
       this.setData({
         isLogin: false,
         isAdmin: false,
-        userInfo: { nickName: '', avatarUrl: DEFAULT_AVATAR },
+        userInfo: { nickName: '', avatarUrl: DEFAULT_AVATAR, avatarDisplay: DEFAULT_AVATAR },
         userId: ''
       })
+    }
+  },
+
+  // 将持久头像 fileID 解析为可展示地址（临时 https），仅更新展示字段，不回写持久记录。
+  // 解析是异步的：写回前要求「请求序号 + 当前用户 openid + 持久头像」三者同时匹配本次请求，
+  // 作废登出、换用户、同 fileID 换用户（A→B→A）等场景下迟到的旧解析结果。
+  async refreshAvatarDisplay(persistentAvatar) {
+    const generation = (this._avatarGeneration = (this._avatarGeneration || 0) + 1)
+    const identity = currentOpenid()
+    const display = await resolveAvatarForDisplay(persistentAvatar)
+    if (!display) return
+    if (this._avatarGeneration !== generation) return
+    if (currentOpenid() !== identity) return
+    const current = this.data.userInfo && this.data.userInfo.avatarUrl
+    if (current === persistentAvatar && display !== this.data.userInfo.avatarDisplay) {
+      this.setData({ 'userInfo.avatarDisplay': display })
     }
   },
 
@@ -128,7 +171,8 @@ Page({
   onEditProfile() {
     this.setData({
       showEditPanel: true,
-      editAvatar: this.data.userInfo.avatarUrl,
+      // 预览用可展示地址；保存时仍以持久 fileID 为准
+      editAvatar: this.data.userInfo.avatarDisplay || this.data.userInfo.avatarUrl,
       editNickName: this.data.userInfo.nickName
     })
   },
@@ -163,14 +207,18 @@ Page({
 
     showLoading('保存中')
     try {
-      // 如果用户选了新头像，上传到云存储
-      let finalAvatar = avatarUrl
-      if (avatarUrl && (avatarUrl.startsWith('http://tmp') || avatarUrl.startsWith('wxfile://'))) {
-        const uploadRes = await wx.cloud.uploadFile({
+      // 仅当用户新选本地头像时上传到共享目标存储；否则保留持久 fileID（不回写临时展示地址）
+      let finalAvatar = this.data.userInfo.avatarUrl || DEFAULT_AVATAR
+      const candidate = (avatarUrl || '').trim()
+      if (candidate.startsWith('http://tmp') || candidate.startsWith('wxfile://')) {
+        const uploadRes = await sharedCloud.uploadFile({
           cloudPath: `avatars/${Date.now()}-${Math.random().toString(36).slice(2)}.jpg`,
-          filePath: avatarUrl
+          filePath: candidate
         })
         finalAvatar = uploadRes.fileID
+      } else if (candidate.startsWith('cloud://')) {
+        // 已是持久 fileID（例如重新确认当前头像），直接沿用
+        finalAvatar = candidate
       }
 
       const profile = { nickName, avatarUrl: finalAvatar }

@@ -1,11 +1,13 @@
 const { submitFeedback } = require('../../utils/cozeChat')
 const { callCloud } = require('../../utils/api')
+const sharedCloud = require('../../utils/cloud')
 const { showToast, requireLogin } = require('../../utils/util')
 
 const SEVERITY_LABELS = ['无', '轻微', '中等', '较重', '严重']
 
-// 客服二维码云存储 fileID；展示前下载为本地临时文件，避免 image 将 cloud:// 误判为相对路径。
-const SERVICE_QRCODE_FILE_ID = 'cloud://cloud1-9g32qnjv9f0dc26a.636c-cloud1-9g32qnjv9f0dc26a-1412631187/pic/微信客服.jpg'
+// 客服二维码云存储 fileID（迁移后位于共享目标 apps/snkg/pic/）；展示前下载为本地临时文件，
+// 避免 image 将 cloud:// 误判为相对路径。
+const SERVICE_QRCODE_FILE_ID = 'cloud://yuelai-0gawhvuc757cd498.7975-yuelai-0gawhvuc757cd498-1313725099/apps/snkg/pic/微信客服.jpg'
 
 // 证据等级归一化：高→A 中→B 低→C，缺省 C
 function normalizeEvidenceLevel(raw) {
@@ -644,7 +646,7 @@ Page({
       serviceQrcodeStatus: 'loading',
       serviceQrcode: ''
     })
-    wx.cloud.downloadFile({
+    sharedCloud.downloadFile({
       fileID: SERVICE_QRCODE_FILE_ID,
       success: (res) => {
         if (!res.tempFilePath) {
@@ -658,6 +660,8 @@ Page({
         console.warn('下载客服二维码失败:', err)
         this.setData({ serviceQrcodeStatus: 'error' })
       }
+    }).catch(() => {
+      // 错误已由 fail 回调更新界面，此处仅消费返回的 Promise 以避免未处理拒绝
     })
   },
 

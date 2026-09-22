@@ -1,4 +1,5 @@
 const cloud = require('wx-server-sdk');
+const { resolveIdentity } = require('./identity');
 
 cloud.init({
   env: cloud.DYNAMIC_CURRENT_ENV
@@ -6,7 +7,7 @@ cloud.init({
 
 const db = cloud.database();
 const _ = db.command;
-const userCollection = db.collection('users');
+const userCollection = db.collection('snkg-users');
 
 const getProfile = async (openid) => {
   // 兼容两种存储：系统字段 _openid 和业务字段 openid
@@ -76,7 +77,7 @@ const submitFeedback = async (openid, content, contact) => {
   if (text.length > 1000) {
     return { success: false, message: '反馈内容过长（最多1000字）' };
   }
-  await db.collection('user_feedback').add({
+  await db.collection('snkg-user_feedback').add({
     data: {
       openid,
       content: text,
@@ -90,8 +91,12 @@ const submitFeedback = async (openid, content, contact) => {
 
 exports.main = async (event = {}) => {
   const { action, profile, content, contact } = event;
-  const wxContext = cloud.getWXContext();
-  const openid = wxContext.OPENID;
+  const identity = resolveIdentity(cloud.getWXContext());
+
+  if (!identity.valid) {
+    return { success: false, message: 'unauthorized' };
+  }
+  const openid = identity.openid;
 
   if (!action) {
     return {

@@ -1,9 +1,12 @@
 const cloud = require('wx-server-sdk')
+const { resolveIdentity } = require('./identity')
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 
 const db = cloud.database()
 const _ = db.command
+
+const PREFIX = 'snkg-'
 
 const DEFAULT_PATH_DEPTH = 3
 const MAX_PATH_DEPTH = 5
@@ -55,12 +58,12 @@ const parseMaxDepth = (value) => {
 const escapeRegex = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
 const getAllNodes = async () => {
-  const result = await db.collection('kg_nodes').limit(MAX_QUERY_LIMIT).get()
+  const result = await db.collection(PREFIX + 'kg_nodes').limit(MAX_QUERY_LIMIT).get()
   return result.data || []
 }
 
 const getAllEdges = async () => {
-  const result = await db.collection('kg_edges').limit(MAX_QUERY_LIMIT).get()
+  const result = await db.collection(PREFIX + 'kg_edges').limit(MAX_QUERY_LIMIT).get()
   return result.data || []
 }
 
@@ -70,7 +73,7 @@ const getNodesByIds = async (nodeIds = []) => {
     return []
   }
 
-  const result = await db.collection('kg_nodes').where({
+  const result = await db.collection(PREFIX + 'kg_nodes').where({
     node_id: _.in(ids)
   }).limit(MAX_QUERY_LIMIT).get()
 
@@ -128,7 +131,7 @@ async function handleNeighbors(params) {
     return badRequest('entity_id is required')
   }
 
-  const centerResult = await db.collection('kg_nodes').where({
+  const centerResult = await db.collection(PREFIX + 'kg_nodes').where({
     node_id: entityId
   }).limit(1).get()
   const center = (centerResult.data || [])[0] || null
@@ -136,7 +139,7 @@ async function handleNeighbors(params) {
     return badRequest(`entity_id not found: ${entityId}`)
   }
 
-  const edgeResult = await db.collection('kg_edges').where(_.or([
+  const edgeResult = await db.collection(PREFIX + 'kg_edges').where(_.or([
     { source: entityId },
     { target: entityId }
   ])).limit(MAX_QUERY_LIMIT).get()
@@ -279,7 +282,7 @@ async function handleSearch(params) {
     return badRequest('keyword is required')
   }
 
-  const result = await db.collection('kg_nodes').where({
+  const result = await db.collection(PREFIX + 'kg_nodes').where({
     label: db.RegExp({
       regexp: escapeRegex(keyword),
       options: 'i'
@@ -291,6 +294,10 @@ async function handleSearch(params) {
 
 exports.main = async (event = {}, context) => {
   const { action, ...params } = event
+  const identity = resolveIdentity(cloud.getWXContext())
+  if (!identity.valid) {
+    return { code: 401, message: 'unauthorized', data: null }
+  }
   try {
     switch (action) {
       case 'graph':

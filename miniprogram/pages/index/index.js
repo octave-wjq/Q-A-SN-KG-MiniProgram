@@ -1,7 +1,9 @@
 const { showToast, showLoading, hideLoading } = require('../../utils/util');
 const { callCloud } = require('../../utils/api');
 const { createConversation, sendAndGetReply } = require('../../utils/cozeChat');
+const sharedCloud = require('../../utils/cloud');
 
+const DEFAULT_AVATAR = '/images/default-avatar.png';
 const SEVERITY_LABELS = ['无', '轻微', '中等', '较重', '严重'];
 
 // 严重程度可选档位（1-4），用于分段按钮，含配色等级
@@ -111,11 +113,35 @@ function pickEdgeWeight(edge) {
   return Math.abs(value);
 }
 
+// 将头像地址解析为可直接展示的地址；cloud:// fileID 走共享实例解析为临时 https 地址，
+// 其它（默认图 / 外部 URL）原样返回。持久 fileID 始终保留，不回写临时地址。
+function resolveAvatarForDisplay(url) {
+  if (!url) return Promise.resolve('');
+  if (typeof url === 'string' && url.indexOf('cloud://') === 0) {
+    return sharedCloud.resolveForDisplay(url).catch(() => '');
+  }
+  return Promise.resolve(url);
+}
+
+// 当前持久头像（globalData 优先，其次本地缓存）；登出/未设置时为空字符串
+function getPersistentAvatar() {
+  const app = getApp();
+  const userInfo = app.globalData.userInfo || wx.getStorageSync('userInfo') || null;
+  return (userInfo && userInfo.avatarUrl) || '';
+}
+
+// 当前用户 openid（本地缓存优先，兼容 globalData 中已有的身份字段）；登出后为空字符串
+function currentOpenid() {
+  const app = getApp();
+  const userInfo = app.globalData.userInfo || wx.getStorageSync('userInfo') || null;
+  return wx.getStorageSync('openid') || (userInfo && userInfo.openid) || '';
+}
+
 Page({
   data: {
     greeting: '你好，朋友',
     isLogin: false,
-    userAvatar: '/images/default-avatar.png',
+    userAvatar: DEFAULT_AVATAR,
     shortcuts: [
       {
         title: '健康问答',
@@ -176,18 +202,41 @@ Page({
 
     if (isLogin) {
       const nickname = (userInfo && userInfo.nickName) || '朋友';
-      const avatar = (userInfo && userInfo.avatarUrl) || this.data.userAvatar;
+      const avatar = (userInfo && userInfo.avatarUrl) || DEFAULT_AVATAR;
+      // cloud:// fileID 在共享环境下不可直接渲染：解析请求期间先用默认头像占位，
+      // 解析成功后才换成 https；解析失败保持占位，绝不把 fileID 写入展示字段。
+      const isCloudAvatar = typeof avatar === 'string' && avatar.indexOf('cloud://') === 0;
       this.setData({
         isLogin: true,
         greeting: `${period}，${nickname}`,
-        userAvatar: avatar
+        userAvatar: isCloudAvatar ? DEFAULT_AVATAR : avatar
       });
+      // 持久头像 fileID 异步解析为可展示的临时 https 地址，仅更新展示字段，不回写持久记录。
+      this.refreshAvatarDisplay(avatar);
     } else {
+      // 每次展示/登出都作废在途解析，避免旧结果迟到覆盖游客展示
+      this._avatarGeneration = (this._avatarGeneration || 0) + 1;
       this.setData({
         isLogin: false,
         greeting: `${period}，游客`,
-        userAvatar: '/images/default-avatar.png'
+        userAvatar: DEFAULT_AVATAR
       });
+    }
+  },
+
+  // 将持久头像 fileID 解析为可展示地址（临时 https），仅更新 userAvatar 展示字段。
+  // 解析是异步的：写回前要求「请求序号 + 当前用户 openid + 持久头像」三者同时匹配本次请求，
+  // 作废登出、换用户、同 fileID 换用户（A→B→A）等场景下迟到的旧解析结果。
+  async refreshAvatarDisplay(persistentAvatar) {
+    const generation = (this._avatarGeneration = (this._avatarGeneration || 0) + 1);
+    const identity = currentOpenid();
+    const display = await resolveAvatarForDisplay(persistentAvatar);
+    if (!display) return;
+    if (this._avatarGeneration !== generation) return;
+    if (currentOpenid() !== identity) return;
+    if (getPersistentAvatar() !== persistentAvatar) return;
+    if (display !== this.data.userAvatar) {
+      this.setData({ userAvatar: display });
     }
   },
 

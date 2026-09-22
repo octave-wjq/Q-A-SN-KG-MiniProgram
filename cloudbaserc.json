@@ -1,0 +1,55 @@
+{
+  "envId": "yuelai-0gawhvuc757cd498",
+  "functionRoot": "cloudfunctions/",
+  "functions": [
+    {
+      "name": "snkg-login",
+      "runtime": "Nodejs16.13",
+      "timeout": 3,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "snkg-user",
+      "runtime": "Nodejs16.13",
+      "timeout": 3,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "snkg-coze",
+      "runtime": "Nodejs16.13",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "snkg-health",
+      "runtime": "Nodejs16.13",
+      "timeout": 3,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "snkg-import_data",
+      "runtime": "Nodejs16.13",
+      "timeout": 60,
+      "memorySize": 1024,
+      "installDependency": true
+    },
+    {
+      "name": "snkg-kg",
+      "runtime": "Nodejs16.13",
+      "timeout": 60,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "snkg-sn",
+      "runtime": "Nodejs16.13",
+      "timeout": 3,
+      "memorySize": 256,
+      "installDependency": true
+    }
+  ]
+}

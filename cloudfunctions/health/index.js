@@ -1,4 +1,5 @@
 const cloud = require('wx-server-sdk')
+const { resolveIdentity } = require('./identity')
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 
@@ -10,16 +11,16 @@ const DEFAULT_PAGE_SIZE = 10
 const MAX_PAGE_SIZE = 50
 
 const COLLECTIONS = {
-  medication: 'health_medications',
-  medicationRecord: 'health_medication_records',
-  medicationReminder: 'health_medication_reminders',
-  medicationTaken: 'health_medication_taken',
-  appointment: 'health_appointments',
-  exercise: 'health_exercises',
-  diet: 'health_diets',
-  symptom: 'health_symptoms',
-  calorieProfile: 'health_calorie_profile',
-  calorieRecord: 'health_calorie_records'
+  medication: 'snkg-health_medications',
+  medicationRecord: 'snkg-health_medication_records',
+  medicationReminder: 'snkg-health_medication_reminders',
+  medicationTaken: 'snkg-health_medication_taken',
+  appointment: 'snkg-health_appointments',
+  exercise: 'snkg-health_exercises',
+  diet: 'snkg-health_diets',
+  symptom: 'snkg-health_symptoms',
+  calorieProfile: 'snkg-health_calorie_profile',
+  calorieRecord: 'snkg-health_calorie_records'
 }
 
 const EXERCISE_INTENSITY = ['低', '中', '高']
@@ -1453,7 +1454,12 @@ const ACTION_MAP = {
 
 exports.main = async (event = {}) => {
   const { action, ...params } = event
-  const { OPENID } = cloud.getWXContext()
+  const identity = resolveIdentity(cloud.getWXContext())
+
+  if (!identity.valid) {
+    return fail(401, 'unauthorized')
+  }
+  const OPENID = identity.openid
 
   if (!OPENID) {
     return fail(401, 'openid not found')

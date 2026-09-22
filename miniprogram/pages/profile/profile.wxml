@@ -1,7 +1,7 @@
 <view class="container profile-page">
   <!-- 已登录：用户信息卡片 -->
   <view class="card user-card" wx:if="{{isLogin}}">
-    <image class="avatar" src="{{userInfo.avatarUrl}}" mode="aspectFill" />
+    <image class="avatar" src="{{userInfo.avatarDisplay || userInfo.avatarUrl}}" mode="aspectFill" />
     <view class="user-main">
       <text class="nickname">{{userInfo.nickName}}</text>
       <text class="user-id">ID：{{userId}}</text>

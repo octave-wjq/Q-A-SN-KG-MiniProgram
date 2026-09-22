@@ -1,9 +1,15 @@
 const cloud = require('wx-server-sdk')
+const { resolveIdentity } = require('./identity')
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 const db = cloud.database()
 const _ = db.command
 const https = require('https')
-const { COZE_API_TOKEN, WORKFLOW_ID } = require('./config')
+const { WORKFLOW_ID } = require('./config')
+// 敏感 API Key 不放入 config.js；由发布流程生成的 gitignored 文件提供
+const { apiKey } = require('./coze-credentials.json')
+
+// 迁移集合前缀：所有目标集合统一 snkg-<原名>
+const PREFIX = 'snkg-'
 
 // ---- 知识图谱全量缓存（模块级，跨调用复用）----
 let _kgNodesCache = null
@@ -30,7 +36,7 @@ function makeHttpRequest(options, data) {
 }
 
 const cozeHeaders = {
-  'Authorization': `Bearer ${COZE_API_TOKEN}`,
+  'Authorization': `Bearer ${apiKey}`,
   'Content-Type': 'application/json'
 }
 
@@ -53,13 +59,13 @@ async function createConversationRecord(userId) {
     lastMessage: '',
     isActive: true
   }
-  const addResult = await db.collection('conversations').add({ data })
+  const addResult = await db.collection(PREFIX + 'conversations').add({ data })
   return { _id: addResult._id, ...data }
 }
 
 async function getUserConversation(conversationId, userId) {
   if (!conversationId) return null
-  const result = await db.collection('conversations')
+  const result = await db.collection(PREFIX + 'conversations')
     .where({
       _id: conversationId,
       userId,
@@ -74,11 +80,11 @@ async function getUserConversation(conversationId, userId) {
 async function loadAllKgNodes() {
   if (_kgNodesCache) return _kgNodesCache
   const PAGE = 100
-  const countRes = await db.collection('kg_nodes').count()
+  const countRes = await db.collection(PREFIX + 'kg_nodes').count()
   const total = countRes.total || 0
   const tasks = []
   for (let i = 0; i * PAGE < total; i++) {
-    tasks.push(db.collection('kg_nodes').skip(i * PAGE).limit(PAGE).get())
+    tasks.push(db.collection(PREFIX + 'kg_nodes').skip(i * PAGE).limit(PAGE).get())
   }
   const results = await Promise.all(tasks)
   const all = []
@@ -91,11 +97,11 @@ async function loadAllKgNodes() {
 async function loadAllKgEdges() {
   if (_kgEdgesCache) return _kgEdgesCache
   const PAGE = 100
-  const countRes = await db.collection('kg_edges').count()
+  const countRes = await db.collection(PREFIX + 'kg_edges').count()
   const total = countRes.total || 0
   const tasks = []
   for (let i = 0; i * PAGE < total; i++) {
-    tasks.push(db.collection('kg_edges').skip(i * PAGE).limit(PAGE).get())
+    tasks.push(db.collection(PREFIX + 'kg_edges').skip(i * PAGE).limit(PAGE).get())
   }
   const results = await Promise.all(tasks)
   const all = []
@@ -117,7 +123,7 @@ async function buildGraphContext(question, matchText) {
   let kgHitCount = 0
 
   try {
-    const snResult = await db.collection('sn_graph').doc('sn_graph_v1').get()
+    const snResult = await db.collection(PREFIX + 'sn_graph').doc('sn_graph_v1').get()
     if (snResult.data) {
       const nodes = snResult.data.nodes || []
       const edges = snResult.data.edges || []
@@ -446,7 +452,7 @@ async function handleChat(params, openid) {
   const sources = references.literature.map(item => item.title)
 
   // 存入 qa_history
-  const qaResult = await db.collection('qa_history').add({
+  const qaResult = await db.collection(PREFIX + 'qa_history').add({
     data: {
       _openid: openid,
       question,
@@ -463,7 +469,7 @@ async function handleChat(params, openid) {
   })
 
   const userMessageTime = new Date()
-  await db.collection('messages').add({
+  await db.collection(PREFIX + 'messages').add({
     data: {
       conversationId,
       userId: openid,
@@ -474,7 +480,7 @@ async function handleChat(params, openid) {
   })
 
   const assistantMessageTime = new Date()
-  await db.collection('messages').add({
+  await db.collection(PREFIX + 'messages').add({
     data: {
       conversationId,
       userId: openid,
@@ -499,7 +505,7 @@ async function handleChat(params, openid) {
   if (isFirstMessage) {
     conversationUpdate.title = buildConversationTitle(question)
   }
-  await db.collection('conversations').doc(conversationId).update({
+  await db.collection(PREFIX + 'conversations').doc(conversationId).update({
     data: conversationUpdate
   })
 
@@ -526,7 +532,7 @@ async function handleCreateConversation(openid) {
 
 // ---- action: getConversations ----
 async function handleGetConversations(openid) {
-  const result = await db.collection('conversations')
+  const result = await db.collection(PREFIX + 'conversations')
     .where({
       userId: openid,
       isActive: _.neq(false)
@@ -559,7 +565,7 @@ async function handleGetMessages(params, openid) {
   const rows = []
 
   while (!done) {
-    const batch = await db.collection('messages')
+    const batch = await db.collection(PREFIX + 'messages')
       .where({ conversationId, userId: openid })
       .orderBy('createdAt', 'asc')
       .skip(skip)
@@ -593,7 +599,7 @@ async function handleDeleteConversation(params, openid) {
     return { success: false, error: '会话不存在或无权限' }
   }
 
-  await db.collection('conversations').doc(conversationId).update({
+  await db.collection(PREFIX + 'conversations').doc(conversationId).update({
     data: {
       isActive: false,
       updatedAt: new Date()
@@ -617,7 +623,7 @@ async function handleRenameConversation(params, openid) {
     return { success: false, error: '会话不存在或无权限' }
   }
 
-  await db.collection('conversations').doc(conversationId).update({
+  await db.collection(PREFIX + 'conversations').doc(conversationId).update({
     data: { title, updatedAt: new Date() }
   })
   return { success: true, data: { updated: true } }
@@ -629,8 +635,8 @@ async function handleHistory(params, openid) {
   const pageSize = Math.min(100, Math.max(1, parseInt(params.page_size) || 20))
   const skip = (page - 1) * pageSize
 
-  const countResult = await db.collection('qa_history').where({ _openid: openid }).count()
-  const listResult = await db.collection('qa_history')
+  const countResult = await db.collection(PREFIX + 'qa_history').where({ _openid: openid }).count()
+  const listResult = await db.collection(PREFIX + 'qa_history')
     .where({ _openid: openid })
     .orderBy('timestamp', 'desc')
     .skip(skip)
@@ -652,13 +658,13 @@ async function handleFeedback(params, openid) {
 
   // 尝试更新 qa_history
   try {
-    await db.collection('qa_history').doc(qa_id).update({
+    await db.collection(PREFIX + 'qa_history').doc(qa_id).update({
       data: { feedback: feedbackData }
     })
   } catch (e) {
     console.warn('[feedback] qa_history 更新失败，尝试直接写入:', e.message)
     // 文档可能不存在，直接创建反馈记录
-    await db.collection('qa_feedback').add({
+    await db.collection(PREFIX + 'qa_feedback').add({
       data: {
         qa_id,
         _openid: openid,
@@ -671,7 +677,7 @@ async function handleFeedback(params, openid) {
 
   // 同步写入 messages（不影响主流程）
   try {
-    await db.collection('messages').where({ qa_id }).update({
+    await db.collection(PREFIX + 'messages').where({ qa_id }).update({
       data: { feedback: feedbackData }
     })
   } catch (e) {
@@ -684,7 +690,12 @@ async function handleFeedback(params, openid) {
 // ---- 主入口 ----
 exports.main = async (event = {}) => {
   const { action, ...params } = event
-  const { OPENID } = cloud.getWXContext()
+  const identity = resolveIdentity(cloud.getWXContext())
+
+  if (!identity.valid) {
+    return { code: 401, message: 'unauthorized', data: null }
+  }
+  const OPENID = identity.openid
 
   try {
     // 兼容无 action 的直接问答调用（首页症状建议）

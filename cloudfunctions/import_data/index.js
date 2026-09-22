@@ -1,8 +1,11 @@
 const cloud = require('wx-server-sdk')
+const { resolveIdentity } = require('./identity')
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 
 const db = cloud.database()
+
+const PREFIX = 'snkg-'
 
 const ADMIN_OPENIDS = ['oQ0UG7ooFWi9ekMxXK9bO9HM9OOY']
 
@@ -30,16 +33,17 @@ async function upsertById(collectionName, docId, payload) {
   await collection.doc(docId).set({ data: payload })
 }
 
-async function importSingleDoc(collectionName, docId, data) {
+async function importSingleDoc(collectionName, docId, data, logicalName) {
   if (!isPlainObject(data)) {
     throw new Error(`${collectionName} data must be an object`)
   }
 
   await upsertById(collectionName, docId, data)
-  return { [collectionName]: 1 }
+  // 响应键用逻辑名（无前缀），物理集合名保持 snkg-* 隔离
+  return { [logicalName || collectionName]: 1 }
 }
 
-async function importArrayDocs(collectionName, data, buildDocId, offset) {
+async function importArrayDocs(collectionName, data, buildDocId, offset, logicalName) {
   if (!Array.isArray(data)) {
     throw new Error(`${collectionName} data must be an array`)
   }
@@ -53,7 +57,7 @@ async function importArrayDocs(collectionName, data, buildDocId, offset) {
     return upsertById(collectionName, docId, item)
   }))
 
-  return { [collectionName]: data.length }
+  return { [logicalName || collectionName]: data.length }
 }
 
 const buildSimulationId = (item, index) => {
@@ -81,28 +85,28 @@ const buildKgNodeId = (item) => `kg_node_${item.node_id || item.label}`
 const buildKgEdgeId = (item, index, offset) => `kg_edge_${offset + index + 1}`
 
 async function importSnGraph(data) {
-  return importSingleDoc('sn_graph', 'sn_graph_v1', data)
+  return importSingleDoc(PREFIX + 'sn_graph', 'sn_graph_v1', data, 'sn_graph')
 }
 
 async function importSnCentrality(data) {
-  return importSingleDoc('sn_centrality', 'sn_centrality_v1', data)
+  return importSingleDoc(PREFIX + 'sn_centrality', 'sn_centrality_v1', data, 'sn_centrality')
 }
 
 async function importSnSimulation(data) {
-  return importArrayDocs('sn_simulation', data, buildSimulationId)
+  return importArrayDocs(PREFIX + 'sn_simulation', data, buildSimulationId, undefined, 'sn_simulation')
 }
 
 async function importSnSpillover(data) {
-  return importArrayDocs('sn_spillover', data, buildSpilloverId)
+  return importArrayDocs(PREFIX + 'sn_spillover', data, buildSpilloverId, undefined, 'sn_spillover')
 }
 
 async function importKgNodes(data) {
-  return importArrayDocs('kg_nodes', data, buildKgNodeId, 0)
+  return importArrayDocs(PREFIX + 'kg_nodes', data, buildKgNodeId, 0, 'kg_nodes')
 }
 
 async function importKgEdges(data, batch) {
   const offset = (batch || 0) * 250
-  return importArrayDocs('kg_edges', data, buildKgEdgeId, offset)
+  return importArrayDocs(PREFIX + 'kg_edges', data, buildKgEdgeId, offset, 'kg_edges')
 }
 
 async function importAll(data) {
@@ -124,7 +128,12 @@ async function importAll(data) {
 
 exports.main = async (event = {}) => {
   const { action, data, batch } = event
-  const { OPENID } = cloud.getWXContext()
+  const identity = resolveIdentity(cloud.getWXContext())
+
+  if (!identity.valid) {
+    return { code: 401, message: 'unauthorized', data: null }
+  }
+  const OPENID = identity.openid
 
   if (!ADMIN_OPENIDS.includes(OPENID)) {
     return { code: 403, message: '无权限执行此操作', data: null }
@@ -156,12 +165,12 @@ exports.main = async (event = {}) => {
         imported = await importAll(data)
         break
       case 'count': {
-        // 返回各集合实际文档总数，供导入后核验
+        // 返回各集合实际文档总数，供导入后核验；计数针对 snkg- 前缀集合，返回键保持原名
         const names = ['kg_nodes', 'kg_edges', 'sn_graph', 'sn_centrality', 'sn_simulation', 'sn_spillover']
         const counts = {}
         await Promise.all(names.map(async (n) => {
           try {
-            const r = await db.collection(n).count()
+            const r = await db.collection(PREFIX + n).count()
             counts[n] = r.total
           } catch (e) {
             counts[n] = -1

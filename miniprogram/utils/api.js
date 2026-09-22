@@ -1,3 +1,5 @@
+const sharedCloud = require('./cloud');
+
 const DEFAULT_SERVER_BASE_URL = 'http://111.229.149.38:8000';
 
 const getServerBaseUrl = () => {
@@ -40,18 +42,10 @@ const callServer = (path, method = 'GET', data = {}) => {
 };
 
 const callCloud = (name, data = {}, timeout = 60000) =>
-  new Promise((resolve, reject) => {
-    wx.cloud.callFunction({
-      name,
-      data,
-      config: { timeout },
-      success: (res) => {
-        resolve(res.result || res);
-      },
-      fail: (error) => {
-        reject(error);
-      }
-    });
+  sharedCloud.callFunction({
+    name,
+    data,
+    config: { timeout }
   });
 
 const callCoze = async (question) => {
