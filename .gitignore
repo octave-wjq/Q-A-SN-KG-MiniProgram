@@ -7,9 +7,9 @@ node_modules/
 **/.DS_Store
 
 # 密钥/敏感配置（部署时本地填写，勿提交真实值）
-# coze/config.js 已改为无密钥正式配置，随仓库提交；Coze API Key 由发布流程生成的
+# snkg-coze/config.js 已改为无密钥正式配置，随仓库提交；Coze API Key 由发布流程生成的
 # coze-credentials.json 提供，必须忽略
-cloudfunctions/coze/coze-credentials.json
+cloudfunctions/snkg-coze/coze-credentials.json
 **/coze-credentials.json
 project.private.config.json
 .env

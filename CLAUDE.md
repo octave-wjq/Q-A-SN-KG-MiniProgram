@@ -10,12 +10,12 @@
 微信小程序（前端）
     ↓ wx.cloud.callFunction()
 云函数（Node.js）
-    ├── login        → 微信登录，返回 openid
-    ├── user         → 用户信息 CRUD（云数据库）
-    ├── coze         → 直接调 Coze API（RAG问答）
-    ├── kg           → 知识图谱查询（云数据库）
-    ├── sn           → 症状网络数据查询（云数据库，预计算）
-    └── health       → 健康管理工具（云数据库）
+    ├── snkg-login    → 微信登录，返回 openid
+    ├── snkg-user     → 用户信息 CRUD（云数据库）
+    ├── snkg-coze     → 直接调 Coze API（RAG问答）
+    ├── snkg-kg       → 知识图谱查询（云数据库）
+    ├── snkg-sn       → 症状网络数据查询（云数据库，预计算）
+    └── snkg-health   → 健康管理工具（云数据库）
 云数据库（MongoDB-like）
     ├── kg_nodes     → 知识图谱节点
     ├── kg_edges     → 知识图谱边（三元组）
@@ -60,12 +60,12 @@ Q-A-SN-KG-MiniProgram/
 │   │   └── util.js             # 工具函数
 │   └── images/                 # 图标资源
 ├── cloudfunctions/             # 云函数
-│   ├── login/                  # 微信登录
-│   ├── user/                   # 用户信息
-│   ├── coze/                   # Coze API 代理（待创建）
-│   ├── kg/                     # 知识图谱查询（待创建）
-│   ├── sn/                     # 症状网络查询（待创建）
-│   └── health/                 # 健康管理（待创建）
+│   ├── snkg-login/              # 微信登录
+│   ├── snkg-user/               # 用户信息
+│   ├── snkg-coze/               # Coze API 代理（待创建）
+│   ├── snkg-kg/                 # 知识图谱查询（待创建）
+│   ├── snkg-sn/                 # 症状网络查询（待创建）
+│   └── snkg-health/             # 健康管理（待创建）
 ├── scripts/                    # 预计算脚本（待创建）
 │   ├── precompute_sn.py        # 症状网络预计算 → JSON
 │   ├── prepare_kg.py           # 知识图谱三元组 → JSON
@@ -97,7 +97,7 @@ Q-A-SN-KG-MiniProgram/
 
 **1.1 创建 coze 云函数**
 ```
-cloudfunctions/coze/
+cloudfunctions/snkg-coze/
 ├── index.js      # 调 Coze API
 ├── package.json  # 依赖 node-fetch 或 axios
 └── config.json   # 云函数配置
@@ -153,7 +153,7 @@ cloudfunctions/coze/
 
 **2.3 创建 sn 云函数**
 ```
-cloudfunctions/sn/
+cloudfunctions/snkg-sn/
 ├── index.js
 └── package.json
 ```
@@ -180,7 +180,7 @@ cloudfunctions/sn/
 
 **3.2 创建 kg 云函数**
 ```
-cloudfunctions/kg/
+cloudfunctions/snkg-kg/
 ├── index.js
 └── package.json
 ```

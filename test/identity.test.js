@@ -4,7 +4,7 @@ const assert = require('node:assert')
 const path = require('node:path')
 
 // 纯函数：无 wx / wx-server-sdk 依赖，直接 require
-const { resolveIdentity, SOURCE_APPID } = require(path.resolve(__dirname, '../cloudfunctions/login/identity.js'))
+const { resolveIdentity, SOURCE_APPID } = require(path.resolve(__dirname, '../cloudfunctions/snkg-login/identity.js'))
 
 test('SOURCE_APPID 保持源小程序 appid 不变', () => {
   assert.strictEqual(SOURCE_APPID, 'wxd08371300aa163c5')

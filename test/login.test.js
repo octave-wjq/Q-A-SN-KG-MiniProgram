@@ -4,8 +4,8 @@ const assert = require('node:assert')
 const path = require('node:path')
 const Module = require('node:module')
 
-const FUNC = path.resolve(__dirname, '../cloudfunctions/login/index.js')
-const IDENTITY = path.resolve(__dirname, '../cloudfunctions/login/identity.js')
+const FUNC = path.resolve(__dirname, '../cloudfunctions/snkg-login/index.js')
+const IDENTITY = path.resolve(__dirname, '../cloudfunctions/snkg-login/identity.js')
 
 function loadLogin(sdk) {
   const orig = Module._load

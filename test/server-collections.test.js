@@ -67,7 +67,7 @@ function sdkFor(ctx, db) {
 
 test('sn 函数：graph/spillover 读取 snkg- 前缀集合', async () => {
   const db = makeDbMock()
-  const mod = loadFunction('sn', sdkFor({ APPID: SOURCE_APPID, OPENID: 'oUser' }, db))
+  const mod = loadFunction('snkg-sn', sdkFor({ APPID: SOURCE_APPID, OPENID: 'oUser' }, db))
 
   const g = await mod.main({ action: 'graph' })
   assert.strictEqual(g.code, 0)
@@ -81,7 +81,7 @@ test('sn 函数：graph/spillover 读取 snkg- 前缀集合', async () => {
 
 test('sn 函数：拒绝非来源 appid', async () => {
   const db = makeDbMock()
-  const mod = loadFunction('sn', sdkFor({ APPID: 'wx3da56dbad356038f', OPENID: 'oX' }, db))
+  const mod = loadFunction('snkg-sn', sdkFor({ APPID: 'wx3da56dbad356038f', OPENID: 'oX' }, db))
   const res = await mod.main({ action: 'graph' })
   assert.strictEqual(res.code, 401)
   assert.strictEqual(db.collections.length, 0)
@@ -89,7 +89,7 @@ test('sn 函数：拒绝非来源 appid', async () => {
 
 test('import_data 单项导入：物理写 snkg-*，响应键保持无前缀逻辑名', async () => {
   const db = makeDbMock()
-  const mod = loadFunction('import_data', sdkFor({ APPID: SOURCE_APPID, OPENID: ADMIN }, db))
+  const mod = loadFunction('snkg-import_data', sdkFor({ APPID: SOURCE_APPID, OPENID: ADMIN }, db))
   const res = await mod.main({ action: 'import_sn_graph', data: { nodes: [], edges: [] } })
   assert.strictEqual(res.code, 0)
   // 响应键不得泄漏物理前缀，仍为旧协议的逻辑键
@@ -101,7 +101,7 @@ test('import_data 单项导入：物理写 snkg-*，响应键保持无前缀逻�
 
 test('import_data import_all：六个响应键保持无前缀逻辑名', async () => {
   const db = makeDbMock()
-  const mod = loadFunction('import_data', sdkFor({ APPID: SOURCE_APPID, OPENID: ADMIN }, db))
+  const mod = loadFunction('snkg-import_data', sdkFor({ APPID: SOURCE_APPID, OPENID: ADMIN }, db))
   const res = await mod.main({
     action: 'import_all',
     data: {
@@ -126,7 +126,7 @@ test('import_data import_all：六个响应键保持无前缀逻辑名', async (
 
 test('import_data count：对 snkg- 前缀集合计数，响应保持原有 data.imported 协议', async () => {
   const db = makeDbMock()
-  const mod = loadFunction('import_data', sdkFor({ APPID: SOURCE_APPID, OPENID: ADMIN }, db))
+  const mod = loadFunction('snkg-import_data', sdkFor({ APPID: SOURCE_APPID, OPENID: ADMIN }, db))
   const res = await mod.main({ action: 'count' })
   assert.strictEqual(res.code, 0)
   // 保持原响应协议：ok() 将结果包在 data.imported 下
@@ -141,7 +141,7 @@ test('import_data count：对 snkg- 前缀集合计数，响应保持原有 data
 
 test('import_data：非来源 appid 拒绝（401），不执行计数', async () => {
   const db = makeDbMock()
-  const mod = loadFunction('import_data', sdkFor({ APPID: 'wx3da56dbad356038f', OPENID: ADMIN }, db))
+  const mod = loadFunction('snkg-import_data', sdkFor({ APPID: 'wx3da56dbad356038f', OPENID: ADMIN }, db))
   const res = await mod.main({ action: 'count' })
   assert.strictEqual(res.code, 401)
   assert.strictEqual(db.collections.length, 0)
@@ -149,7 +149,7 @@ test('import_data：非来源 appid 拒绝（401），不执行计数', async ()
 
 test('import_data：来源正确但非管理员拒绝（403）', async () => {
   const db = makeDbMock()
-  const mod = loadFunction('import_data', sdkFor({ APPID: SOURCE_APPID, OPENID: 'oNotAdmin' }, db))
+  const mod = loadFunction('snkg-import_data', sdkFor({ APPID: SOURCE_APPID, OPENID: 'oNotAdmin' }, db))
   const res = await mod.main({ action: 'count' })
   assert.strictEqual(res.code, 403)
   assert.strictEqual(db.collections.length, 0)

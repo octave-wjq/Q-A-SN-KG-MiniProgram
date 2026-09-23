@@ -49,7 +49,7 @@
 - 形成一份干净的「最终版」操作指南。
 
 ## 验证
-- 后端：node -c cloudfunctions/coze/index.js
+- 后端：node -c cloudfunctions/snkg-coze/index.js
 - 前端：node -c 各 js；wxml 标签平衡
 - kg-sn.html 部署后 curl 测 ?focus= 参数页面可访问
 - 真实问题链路（拉米夫定）：参考文献能展开看 snippet、KG/SN 节点有显示且可点击跳转
@@ -57,7 +57,7 @@
 ## 文件清单
 - 改：pages/graph/graph.{js,wxml,wxss}
 - 改：pages/qa/qa.{js,wxml,wxss}
-- 改：cloudfunctions/coze/index.js（节点回扫匹配）
+- 改：cloudfunctions/snkg-coze/index.js（节点回扫匹配）
 - 改：web/graph.html（URL focus 参数）→ 部署为 kg-sn.html
 - 改：doc/coze-workflow-guide.md（最终版）
 - 不动：pages/webview/（复用）

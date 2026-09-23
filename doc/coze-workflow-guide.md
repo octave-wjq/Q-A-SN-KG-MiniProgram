@@ -1,13 +1,13 @@
 # Coze 工作流搭建指南 — 艾滋病健康问答 RAG（最终版）
 
-> 本文档是问答模块工作流的**唯一权威说明**，已整合证据溯源、防分类器污染、KG/SN 节点联动、参考文献 snippet 等全部最新设计。后端 `cloudfunctions/coze/index.js` 已按本文档对接完成。
+> 本文档是问答模块工作流的**唯一权威说明**，已整合证据溯源、防分类器污染、KG/SN 节点联动、参考文献 snippet 等全部最新设计。后端 `cloudfunctions/snkg-coze/index.js` 已按本文档对接完成。
 
 ## 概述
 
 艾滋病健康管理小程序的智能问答模块，采用 RAG（检索增强生成）架构：图谱检索 + 知识库检索 + 大模型生成，为患者提供**可溯源**的循证健康建议。
 
 - **调用方式**：Workflow API（同步，`POST /v1/workflow/run`）
-- **环境**：云开发 `cloud1-9g32qnjv9f0dc26a`；配置见 `cloudfunctions/coze/config.js`（WORKFLOW_ID / COZE_API_TOKEN）
+- **环境**：云开发 `cloud1-9g32qnjv9f0dc26a`；配置见 `cloudfunctions/snkg-coze/config.js`（WORKFLOW_ID / COZE_API_TOKEN）
 - **输入参数**：`BOT_USER_INPUT`（干净的用户问题）、`GRAPH_CONTEXT`（图谱上下文）、`user_id`
 - **输出格式**：结构化 JSON 字符串（见下文「回答生成节点」）
 
@@ -185,7 +185,7 @@ output = '{"answer":"抱歉，我只能回答与HIV/AIDS健康管理相关的问
 
 ---
 
-## 后端对接（`cloudfunctions/coze/index.js`，已完成，无需改）
+## 后端对接（`cloudfunctions/snkg-coze/index.js`，已完成，无需改）
 
 ### 发送参数
 ```js
